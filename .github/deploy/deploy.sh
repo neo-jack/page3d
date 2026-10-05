@@ -49,8 +49,14 @@ if docker container inspect "$previous" >/dev/null 2>&1; then
     echo "An unhandled rollback backup exists: $previous" >&2
     exit 1
 fi
-printf '%s' "$GHCR_TOKEN" | docker --config "$registry_config" login ghcr.io -u "$GHCR_USER" --password-stdin
-docker --config "$registry_config" pull "$DEPLOY_IMAGE"
+if [ "${DEPLOY_IMAGE_LOCAL:-false}" = true ]; then
+    # Only the checked archive of an immutable release may bypass the registry.
+    printf '%s\n' "$DEPLOY_IMAGE" | grep -Eq ':[0-9a-f]{40}$' || exit 1
+    docker image inspect "$DEPLOY_IMAGE" >/dev/null
+else
+    printf '%s' "$GHCR_TOKEN" | docker --config "$registry_config" login ghcr.io -u "$GHCR_USER" --password-stdin
+    docker --config "$registry_config" pull "$DEPLOY_IMAGE"
+fi
 
 if [ "$DEPLOY_COMPONENT" = ai ]; then
     test -s "$AI_ENV_FILE" || { echo 'The server-side AI environment file is missing.' >&2; exit 1; }

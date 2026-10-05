@@ -141,6 +141,7 @@ jobs:
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEPLOY_IMAGE: ${{ steps.image.outputs.ref }}
           DEPLOY_COMPONENT: 3d
+          DEPLOY_IMAGE_LOCAL: ${{ inputs.direct_transfer && 'true' || 'false' }}
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
@@ -148,5 +149,5 @@ jobs:
           port: '22'
           timeout: 30s
           command_timeout: 30m
-          envs: GHCR_USER,GHCR_TOKEN,DEPLOY_IMAGE,DEPLOY_COMPONENT
+          envs: GHCR_USER,GHCR_TOKEN,DEPLOY_IMAGE,DEPLOY_COMPONENT,DEPLOY_IMAGE_LOCAL
           script_path: .github/deploy/deploy.sh

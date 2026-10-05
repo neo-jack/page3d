@@ -36,6 +36,7 @@ if [ "$1" = --config ]; then shift 2; fi
 state="$MOCK_ROOT/state"
 case "$1" in
  container) test -f "$state/$3" ;;
+ image) [ "$FAILURE" != local-image ] ;;
  network) if [ "$2" = connect ] && [ "$FAILURE" = network ]; then exit 1; fi ;;
  login) cat >/dev/null ;;
  pull) [ "$FAILURE" != pull ] ;;
@@ -72,7 +73,9 @@ esac
     encoding: 'utf8', timeout: 20000,
     env: { ...process.env, MOCK_ROOT: shellPath(root), FAILURE: failure, TARGET: names[component] || 'invalid',
       AI_ENV_FILE: shellPath(path.join(root, '3dai.env')), DEPLOY_LOCK_FILE: shellPath(path.join(root, 'deploy.lock')),
-      GHCR_USER: 'fixture', GHCR_TOKEN: 'fixture', DEPLOY_COMPONENT: component, DEPLOY_IMAGE: 'fixture:sha' },
+      GHCR_USER: 'fixture', GHCR_TOKEN: 'fixture', DEPLOY_COMPONENT: component,
+      DEPLOY_IMAGE_LOCAL: options.local ? 'true' : 'false',
+      DEPLOY_IMAGE: options.local ? `fixture:${'a'.repeat(40)}` : 'fixture:sha' },
   });
   assert.equal(result.error, undefined, String(result.error));
   assert.notEqual(result.status, 99, 'Never use the real Docker daemon');
@@ -80,6 +83,19 @@ esac
   const commands = await readFile(path.join(root, 'commands'), 'utf8').catch(() => '');
   return { ...result, state, initial, commands };
 }
+
+test('verified local release avoids registry and preserves rollback', async t => {
+  const r = await deployment(t, '3d', '', { local: true });
+  assert.equal(r.status, 0, r.stderr);
+  assert.match(r.commands, /image inspect fixture:a{40}/);
+  assert.doesNotMatch(r.commands, /login|pull/);
+  assert.equal(r.state['100my-page'], 'new');
+  for (const failure of ['local-image', 'health', 'assets']) {
+    const failed = await deployment(t, '3d', failure, { local: true });
+    assert.notEqual(failed.status, 0);
+    assert.deepEqual(failed.state, failed.initial);
+  }
+});
 
 for (const component of ['3d', '2d', 'ai']) {
   test(`${component} updates only its own container`, async t => {
