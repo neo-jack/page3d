@@ -55,7 +55,7 @@ export function revealStartup(): Promise<void> {
           reducedMotion
             ? [{ opacity: 1 }, { opacity: 0 }]
             : [{ transform: 'translateX(0) rotate(0)' }, { transform: `translateX(${index === 0 ? '-102%' : '102%'}) rotate(${index === 0 ? '-2deg' : '2deg'})` }],
-          { duration: reducedMotion ? 120 : 1100, delay: reducedMotion ? 0 : 180, easing: 'cubic-bezier(.65, 0, .35, 1)', fill: 'forwards' },
+          { duration: reducedMotion ? 120 : 550, easing: 'cubic-bezier(.65, 0, .35, 1)', fill: 'forwards' },
         ),
       );
       await Promise.all(animations.map((animation) => animation.finished));

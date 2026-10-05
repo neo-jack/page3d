@@ -40,7 +40,7 @@
 - 修改页面行为时优先核对 `HomePage.tsx`、`SiteShell.tsx` 和 `App.tsx` 的状态和容器关系。
 - 桌面 AI 向导常驻清醒并通过说话气泡提供开屏介绍，手机隐藏整个宠物区域与飞行提示；通过显式能力请求头支持砸碎一块玻璃，完整回答成功后由首页检查入口状态并执行。前后端独立发布，线上动作需要新版独立 AI 服务 配合；白名单协议与兼容规则见后端 AGENTS.md。墙地使用独立 imgaier 材质，来源与完整性见 `public/textures/entrance/AGENTS.md`。
 - 门后展示为云层中的“左侧作品卡片 + 右侧技术栈气球”，靠近时向两侧散开；`canvas/portfolio` 管理镜头聚焦，`dom/portfolio/PortfolioDetails.tsx` 展示中文详情，由 `HomePage` 协调。旧头像、奖项和浮岛展示不再挂载。
-- 首次展示由 `StartupLoader` 等待资源、DOM 字体与 `SceneWarmup` 后触发；HTML 加载层位于 React 根节点外，根节点保持 `inert` 直到揭幕完成。HTML 内联入口保持动态导入 `App.tsx`，不能静态导入 Three.js 主包，也不能按固定时间移除加载层。
+- 首次展示由 `StartupLoader` 等待入口资源、DOM 字体与入口 `SceneWarmup` 后触发；门后走廊在揭幕后通过 `DeferredCorridor` 独立加载和预热，不阻塞入口，点击门须等待走廊就绪；HTML 加载层位于 React 根节点外，根节点保持 `inert` 直到揭幕完成。HTML 内联入口保持动态导入 `App.tsx`，不能静态导入 Three.js 主包，也不能按固定时间移除加载层。
 - 仅验证构建时使用 `npm run build -- --outDir node_modules/.cache/startup-preview`，对应 `npm run preview -- --outDir node_modules/.cache/startup-preview`；保留本地 dist，生成产物不再纳入 Git。
 - `App.tsx` 直接渲染 `HomePage`，不根据 URL 路径匹配页面；入口切换由首页组件状态控制；应用入口不拦截链接，也不管理网页回顶或相机导航。
 - 清理源码时从 `src/App.tsx` 追踪静态、动态与副作用导入；同名材质只保留 `src/shaders/RevealBasicMaterial.ts`，不要同时维护 `.ts` / `.tsx` 副本。

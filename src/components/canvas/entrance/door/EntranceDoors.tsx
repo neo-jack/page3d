@@ -16,7 +16,7 @@ import assetGardenWood from '../../../../../public/textures/entrance/garden-wood
 import assetStonePath from '../../../../../public/textures/entrance/stone-path.webp?url';
 import assetWindowSketch from '../../../../../public/textures/entrance/window_sketch.webp?url';
 import assetWindowGlass from '../../../../../public/textures/entrance/window_glass.webp?url';
-import { useEffect, useRef, useState, useMemo, type ReactNode, type RefObject } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, useMemo, type ReactNode, type RefObject } from 'react';
 import { useThree, type ThreeEvent } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
@@ -39,6 +39,7 @@ interface EntranceDoorsProps {
   onReturnHomeComplete?: () => void;
   enabled?: boolean;
   canEnter?: boolean;
+  prepareEntry?: () => Promise<void>;
   introductionBoard?: ReactNode;
   petMode: PaperPetMode;
   petVisible: boolean;
@@ -84,6 +85,7 @@ const EntranceDoors: React.FC<EntranceDoorsProps> = ({
   onReturnHomeComplete,
   enabled = true,
   canEnter = true,
+  prepareEntry,
   introductionBoard,
   petMode,
   petVisible,
@@ -105,8 +107,11 @@ const EntranceDoors: React.FC<EntranceDoorsProps> = ({
   const isMobile = useThree((state) => state.size.width <= 600);
   const entranceCamera = useMemo(() => ({ position: camera.position.clone(), quaternion: camera.quaternion.clone() }), [camera]);
   const entryTimeline = useRef<gsap.core.Timeline | null>(null);
+  const entryRequest = useRef(0);
+  const pendingEntry = useRef(false);
+  useLayoutEffect(() => () => { entryRequest.current += 1; pendingEntry.current = false; }, [enabled, canEnter, isReturningHome]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const leftDoor = leftDoorRef.current;
     const rightDoor = rightDoorRef.current;
     if (enabled && !isReturningHome) {
@@ -139,7 +144,7 @@ const EntranceDoors: React.FC<EntranceDoorsProps> = ({
     camera.position.z = entranceZ + fittedDistance;
   }, [camera, enabled, entranceZ, fittedDistance, isOpen, isReturningHome]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isReturningHome) return;
     // Take over the live camera, including an interrupted portfolio focus.
     // Keep the doors open until the camera has backed out through the entrance.
@@ -335,9 +340,20 @@ const EntranceDoors: React.FC<EntranceDoorsProps> = ({
   useEffect(() => () => pathMap.dispose(), [pathMap]);
 
   // 点击门的处理函数
-  const handleDoorClick = (e: ThreeEvent<MouseEvent>) => {
+  const handleDoorClick = async (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();
-    if (!enabled || isOpen || !canEnter) return;
+    if (!enabled || isOpen || !canEnter || pendingEntry.current) return;
+    const request = ++entryRequest.current;
+    pendingEntry.current = true;
+    try {
+      await prepareEntry?.();
+    } catch {
+      // HomePage keeps the entrance usable and displays the corridor failure.
+      return;
+    } finally {
+      if (request === entryRequest.current) pendingEntry.current = false;
+    }
+    if (request !== entryRequest.current) return;
 
     setIsOpen(true);
     document.body.style.cursor = "auto";

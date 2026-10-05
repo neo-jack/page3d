@@ -1,14 +1,13 @@
 import assetFloorPaper from '../../../../public/textures/entrance/floor_paper.webp?url';
 import type { SyntheticEvent } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import EntranceDoors from '../../canvas/entrance/door/EntranceDoors.tsx';
-import AboutRoom from '../../canvas/about/AboutRoom.tsx';
+import DeferredCorridor from '../../canvas/DeferredCorridor.tsx';
 import SceneWarmup from '../../canvas/SceneWarmup.tsx';
 import SceneActivity from '../../canvas/SceneActivity.tsx';
 import StartupLoader from '../loading/StartupLoader.tsx';
 import IntroductionBoard from '../board/IntroductionBoard.tsx';
-import PortfolioDetails from '../portfolio/PortfolioDetails.tsx';
 import FlightGestureHint from '../flight/FlightGestureHint.tsx';
 import { PaperPetTrigger, PaperPetReply, usePaperPet } from '@my-page/ai-pet';
 import { SiteShell } from '../../ui/SiteShell.tsx';
@@ -21,6 +20,7 @@ import { integrations } from '../../../data/integrations';
 
 const handleWarmupProgress = (progress: number) => setStartupProgress('scene', progress);
 const MOBILE_SCENE_QUERY = '(max-width: 600px), (hover: none) and (pointer: coarse)';
+const PortfolioDetails = lazy(() => import('../portfolio/PortfolioDetails.tsx'));
 
 export function HomePage() {
   const [mobileScene, setMobileScene] = useState(() => window.matchMedia(MOBILE_SCENE_QUERY).matches);
@@ -54,6 +54,30 @@ export function HomePage() {
   const [sceneWarm, setSceneWarm] = useState(false);
   const [introBoardReady, setIntroBoardReady] = useState(false);
   const [pageReady, setPageReady] = useState(false);
+  const [corridorReady, setCorridorReady] = useState(false);
+  const [corridorError, setCorridorError] = useState(false);
+  const [waitingForCorridor, setWaitingForCorridor] = useState(false);
+  const corridorWaiters = useRef<Array<{ resolve: () => void; reject: (error: unknown) => void }>>([]);
+  const handleCorridorReady = useCallback(() => {
+    setCorridorReady(true);
+    setWaitingForCorridor(false);
+    corridorWaiters.current.splice(0).forEach(({ resolve }) => resolve());
+  }, []);
+  const handleCorridorError = useCallback((error: unknown) => {
+    setCorridorError(true);
+    setWaitingForCorridor(false);
+    corridorWaiters.current.splice(0).forEach(({ reject }) => reject(error));
+    console.error('Unable to prepare the corridor:', error);
+  }, []);
+  const prepareEntry = useCallback(() => {
+    if (corridorReady) return Promise.resolve();
+    if (corridorError) return Promise.reject(new Error('Corridor unavailable'));
+    setWaitingForCorridor(true);
+    return new Promise<void>((resolve, reject) => corridorWaiters.current.push({ resolve, reject }));
+  }, [corridorReady, corridorError]);
+  useEffect(() => () => {
+    corridorWaiters.current.splice(0).forEach(({ reject }) => reject(new Error('Page unmounted')));
+  }, []);
   const windowRef = useRef<PaperWindowHandle>(null);
   const handleSceneActions = useCallback((actions: SceneAction[]) => {
     if (mobileScene || !showEntranceContent || !pageReady || !sceneWarm) return ['当前场景暂时无法操作'];
@@ -122,17 +146,6 @@ export function HomePage() {
             <ambientLight intensity={0.8} />
             <directionalLight position={[5, 5, 5]} intensity={1} />
 
-            {/* AboutRoom 始终渲染，放在门后位置（与 ref 走廊相同的逻辑） */}
-            <AboutRoom
-              hasEntered={hasEntered}
-              isReturningHome={isReturningHome}
-              selectedProjectId={selectedProjectId}
-              portfolioPhase={portfolioPhase}
-              onSelectProject={setSelectedProjectId}
-              onPortfolioPhaseChange={setPortfolioPhase}
-              onFlightDistanceReached={handleFlightDistanceReached}
-              onFlightHintProgress={handleFlightHintProgress}
-            />
 
             {/* EntranceDoors 在最上层，门打开时能看到后面的 AboutRoom */}
             <EntranceDoors
@@ -143,6 +156,7 @@ export function HomePage() {
               onReturnHomeComplete={handleReturnHomeComplete}
               enabled={!hasEntered || isReturningHome}
               canEnter={sceneWarm && pageReady && !isReturningHome}
+              prepareEntry={prepareEntry}
               introductionBoard={<IntroductionBoard onLoad={handleIntroBoardLoad} />}
               petMode={pet.mode}
               petVisible={!mobileScene}
@@ -159,6 +173,20 @@ export function HomePage() {
               petReplyPortal={petReplyPortal}
             />
           </Suspense>
+          {/* Entrance alone gates startup; the corridor gets its own loading boundary. */}
+          {pageReady && <DeferredCorridor
+            ready={corridorReady}
+            onReady={handleCorridorReady}
+            onError={handleCorridorError}
+            hasEntered={hasEntered}
+            isReturningHome={isReturningHome}
+            selectedProjectId={selectedProjectId}
+            portfolioPhase={portfolioPhase}
+            onSelectProject={setSelectedProjectId}
+            onPortfolioPhaseChange={setPortfolioPhase}
+            onFlightDistanceReached={handleFlightDistanceReached}
+            onFlightHintProgress={handleFlightHintProgress}
+          />}
         </Canvas>
       </div>
       <div ref={petReplyPortal}
@@ -166,8 +194,10 @@ export function HomePage() {
       {!mobileScene && hasEntered && !isReturningHome && !flightHintDismissed && portfolioPhase === 'idle' && !selectedProjectId && (
         <FlightGestureHint ref={attachFlightHint} />
       )}
-      <PortfolioDetails enabled={hasEntered && !isReturningHome} selectedId={selectedProjectId} phase={portfolioPhase}
-        onClose={closeProject} />
+      {hasEntered && <Suspense fallback={null}>
+        <PortfolioDetails enabled={!isReturningHome} selectedId={selectedProjectId} phase={portfolioPhase}
+          onClose={closeProject} />
+      </Suspense>}
 
       {showEntranceContent && (
         <aside
@@ -198,8 +228,8 @@ export function HomePage() {
           <span className="relative z-1 block font-sans text-[0.92rem] font-bold uppercase tracking-[0.04em] text-[#1a1a1a] max-[600px]:text-[0.8rem]">
             探索
           </span>
-          <span className="relative z-1 block">
-            点击物品进行交互,点击门进入作品集空中走廊
+          <span role="status" className="relative z-1 block">
+            {corridorError ? '作品集暂时加载失败，请刷新重试' : waitingForCorridor ? '正在准备空中走廊，就绪后自动进入…' : '点击物品进行交互,点击门进入作品集空中走廊'}
           </span>
         </aside>
       )}

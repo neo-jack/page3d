@@ -8,7 +8,8 @@
 
 - `entrance/door/EntranceDoors.tsx` — 当前入口门场景，负责门、门框、门前地面和入口墙；物品分类与维护边界见 `entrance/AGENTS.md`。
 - `entrance/wall/EntranceWall.tsx` — 用三块墙板围出门洞，保持门后场景可见。
-- `SceneWarmup.tsx` — 在加载画面下等待 3D 字形、分批上传纹理、编译材质并离屏预渲染入口与 About。
+- `SceneWarmup.tsx` — 等待 3D 字形、分批上传纹理、编译材质并离屏预渲染；可通过 scope 限定后台预热子树。
+- `DeferredCorridor.tsx` — 揭幕后 lazy 加载 About，使用独立 Suspense、错误边界与隐藏组，后台预热完成后显示。
 - `SceneActivity.tsx` — 统一管理页面隐藏时的场景时钟、渲染循环和 GSAP 暂停恢复，挂载在资源 Suspense 外。
 - `about/AboutRoom.tsx` — 关于场景入口，负责滚动输入、飞行姿态和场景挂载。
 - `about/InfiniteSkyManager.jsx` — 云朵区块的动态管理。
@@ -26,13 +27,15 @@
 - 当前所有 GSAP 消费者均在同一 Canvas，`SceneActivity` 因此管理 globalTimeline，清理时取消帧和事件并恢复原暂停状态；新增独立 DOM/多 Canvas GSAP 动画前应改为各自管理时间线。验证切标签/窗口后立即点击、动画中途失活、快速反复切换、返回首页及 StrictMode 清理。
 - 透明纹理和点击区域要明确处理深度写入，避免遮挡门后的场景；入口门洞不要用整块不透明平面填充。
 - 入口组件在进入关于场景后保持挂载，仅通过 `visible` 禁止绘制和交互，避免转场完成时集中释放 GPU 资源。
-- `SceneWarmup.tsx` 位于入口与 About 共用的 Suspense 边界内；等全部已挂载 Troika Text 生成字形后，收集材质贴图、uniform 纹理和文字 SDF 图集，再逐帧上传、`compileAsync` 和两个机位的 128×128 分批离屏绘制。不能仅依据 LoadingManager 的下载完成判断可展示。
+- 入口与 About 分别使用独立 Suspense 和 `SceneWarmup`；入口预热期间 About 尚未挂载。每次等指定子树内 Troika Text 生成字形后，收集材质贴图、uniform 纹理和文字 SDF 图集，再分批上传、`compileAsync` 和单机位的 128×128 分批离屏绘制（关闭视锥裁剪已覆盖全部物体，无需第二机位重复绘制）。不能仅依据 LoadingManager 的下载完成判断可展示。
 - 离屏预热包含隐藏和视锥外的作品卡片；只能临时修改可见性/视锥裁剪，绘制后必须恢复原值与 render target，并释放临时目标。不得移动真实相机或释放缓存场景纹理。
 - 预热错误由 `onError` 回传加载层；异步步骤在解码、编译和下一帧后都检查 effect 清理状态，不得吞掉错误后调用 `onReady`。
 - 新增独立场景时建立新的职责目录和近旁说明，不要把入口和关于场景的状态混在同一组件中。
 
 - 场景图片使用 utils/useSceneTexture，而非 Drei useTexture，避免组件 effect 提前批量上传 GPU。保持原共享加载缓存及克隆纹理释放边界，统一交给 SceneWarmup 上传。
 
-- 首次离屏绘制按最多 8 个可绘制对象分帧预热，临时使用相机与对象 layer mask 选择批次；每次让出执行权前恢复共享对象的 layers、visible、frustumCulled 和 render target，取消或错误也必须恢复。不得把全场景首次 draw 合并回单个长任务。
+- 首次离屏绘制按最多 32 个可绘制对象分批预热，临时使用相机与对象 layer mask 选择批次；每次让出执行权前恢复共享对象的 layers、visible、frustumCulled 和 render target，取消或错误也必须恢复。不得把全场景首次 draw 合并回单个长任务。
 
-- 预热在 rAF 后的新任务中执行；纹理上传与离屏批次之后用 WebGL2 fence/零超时轮询异步等待 GPU，禁止 gl.finish 或忙等。清理同时取消 rAF、定时任务并唤醒等待，释放 fence；不支持 fence 的上下文只让出帧。HTML 图片先按 flipY/premultiplyAlpha 异步生成 ImageBitmap，仅上传时暂换 source.image，finally 恢复原图并关闭 bitmap，保留 CPU alpha 取样和上下文恢复。
+- 预热阶段切换优先在 rAF 后的新任务中执行，并设置 50ms 任务回退，避免窗口遮挡时 rAF 降到 1Hz 导致逐项等待；该回退只调度工作，不跳过资源就绪检查。纹理上传与离屏批次之后用 WebGL2 fence/零超时查询，在 setTimeout 新任务中异步轮询 GPU，不为每次查询等待一整帧，禁止 gl.finish 或忙等。清理同时取消 rAF、定时任务并唤醒等待，释放 fence；不支持 fence 的上下文只让出任务。共享 HTML 图片只解码一次，并按图片对象与 flipY/premultiplyAlpha 分组生成 ImageBitmap；组内复用，仅上传时暂换 source.image 并立即恢复，组结束、取消或异常时 finally 关闭 bitmap，避免持有全场景位图，保留 CPU alpha 取样和上下文恢复。
+
+- 后台预热只遍历 scope 内的文字、纹理和可见性；绘制仍使用完整 scene 保留真实灯光与雾，通过 layer mask 暂时排除 scope 外物体。每次异步让出前恢复全场景 masks、子树可见性和 render target，让 SceneActivity 正常绘制入口；不能暂停入口循环或再次揭幕。后台错误由走廊边界回传首页，不调用已完成的 startup 错误处理。

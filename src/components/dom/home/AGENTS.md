@@ -2,7 +2,7 @@
 
 首页组合、入口与作品选择状态和返回主页；站点控件仍由 ../../ui/SiteShell.tsx 维护。
 
-**Important:** Canvas、入口和 About 保持挂载，首屏 DOM 可见性与进门开始状态同步。
+**Important:** Canvas 与入口保持挂载；About 揭幕后开始挂载，此后持续保留，首屏 DOM 可见性与进门开始状态同步。
 
 ### Important files
 
@@ -13,10 +13,10 @@
 - 将 `sceneWarm` 传入 `SceneActivity.ready`，预热完成后才开始常规场景绘制；不要传入揭幕后的 `pageReady`。保持预热与 DOM 图片就绪检查独立，验证首次加载能正常揭幕。
 
 - 组件样式遵守 `../../AGENTS.md` 的重要规则；首屏不叠加十字标记或网格线。
-- `AboutRoom` 始终挂载；`hasEntered` 控制入口门和滚动交互状态，不要改回只在进入后创建场景。`isEntering` 由入口门的 `onEnterStart` 设置；底部探索提示与宠物交互通过 `showEntranceContent` 控制，进门动画开始即隐藏；墙面简介板由入口场景定位。
+- `DeferredCorridor` 在 `pageReady` 后才挂载 About，独立 Suspense、错误边界和隐藏组隔离后台准备；首次挂载后持续保留；`hasEntered` 控制入口门和滚动交互状态，不要改回只在进入后创建场景。`isEntering` 由入口门的 `onEnterStart` 设置；底部探索提示与宠物交互通过 `showEntranceContent` 控制，进门动画开始即隐藏；墙面简介板由入口场景定位。
 - Canvas 的背景色和雾需要在两个阶段都保持挂载，避免开门飞入期间远景突然失去雾效。
 - Canvas 在资源 Suspense 外始终挂载 `SceneActivity`；页面失活/恢复的渲染时钟与 GSAP 协调集中在该组件，规则见 `../../canvas/AGENTS.md`，不要通过重建 Canvas 或重启加载层处理恢复卡顿。
-- 入口阶段的地面由 `EntranceDoors` 提供；调整入口组件时保持它与 `AboutRoom` 的同时挂载关系。
+- 入口阶段的地面由 `EntranceDoors` 提供；调整入口组件时About 准备完成前仍保持入口交互，不提前开门。
 - `HomePage` 无路由或初始视图参数；`hasEntered` 初始为 `false`，由开门动画完成后设置为 `true`。
 - `hasEntered=true` 且未返回时给 `SiteShell` 传入返回主页回调；点击后设置独立的 `isReturningHome`，关闭详情、隐藏返回按钮和飞行提示，保持 `hasEntered=true` 与首屏 DOM 隐藏。由 `EntranceDoors` 倒退镜头、关门后调用 `onReturnHomeComplete`，再清空入口和飞行状态、恢复首屏内容，不能点击后立即复位相机或滚动进度。Canvas 和场景保持挂载，不重启加载层，不清除声音偏好；飞行提示每次进门重置，不持久化关闭状态。验证须覆盖飞行后返回、再次进门、作品聚焦途中返回及窄屏返回。
 - Canvas 外层现在包含简介板的 HTML，不设置 `aria-hidden`，避免向辅助技术隐藏简介正文。
@@ -31,3 +31,5 @@
 
 - 入口不挂载工程卷轴，不维护其展开状态或等待其图片解码；StartupLoader 仅等待 sceneWarm 与 introBoardReady。旧后端返回不支持的动作时反馈不可用，不回退执行砸窗。
 - AI 宠物与客户端工具由版本化 @my-page/ai-pet 包维护；本项目保留消费端协议测试，服务地址见 src/data/integrations.ts，不导入后端源码。
+
+- 走廊就绪由 `corridorReady` 单独记录；`prepareEntry` 返回 Promise，提前点门显示准备提示，就绪后自动进入，失败只提示走廊不可用并保留入口。回调保持稳定，卸载时拒绝未完成请求。作品详情通过 lazy 在首次进门后加载，不进入首屏主包。
