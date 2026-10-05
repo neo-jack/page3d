@@ -18,3 +18,5 @@
 - 部署门禁为仓库 Actions variable `DEPLOY_ENABLED=true`；默认只运行 CI，不发布镜像或连接服务器。开启前在本仓库配置 SERVER_HOST / SERVER_USER / SERVER_PASSWORD。
 
 - GitHub 仓库名称为 neo-jack/page3d；本地编号目录仅用于排序，不作为远程仓库名。
+
+- GHCR 大资源层下载不稳定时，手动 workflow_dispatch 可设置 direct_transfer=true；构建机导出已发布的精确 SHA 镜像，经相同服务器 SSH 凭据上传至按 run_id/run_attempt 隔离的临时目录，校验 SHA-256 后 docker load。之后仍执行原 deploy.sh 的锁、健康检查及回滚，不绕过 DEPLOY_ENABLED 门禁。默认 push 不启用直传；导入阶段清理本次临时文件，不清理其他运行目录。

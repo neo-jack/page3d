@@ -2,6 +2,11 @@ name: 3Dpage CI/CD
 
 on:
   workflow_dispatch:
+    inputs:
+      direct_transfer:
+        description: Transfer the built image over SSH before deployment (for slow GHCR pulls)
+        type: boolean
+        default: false
   push:
     branches: [master, main]
   pull_request:
@@ -93,6 +98,42 @@ jobs:
           docker push "$image:$GITHUB_SHA"
           docker push "$image:latest"
           echo "ref=$image:$GITHUB_SHA" >> "$GITHUB_OUTPUT"
+      - name: Export image for direct transfer
+        if: inputs.direct_transfer
+        env:
+          DEPLOY_IMAGE: ${{ steps.image.outputs.ref }}
+        run: |
+          docker save "$DEPLOY_IMAGE" | gzip -1 > image.tar.gz
+          sha256sum image.tar.gz > image.sha256
+      - name: Transfer image to server
+        if: inputs.direct_transfer
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: '22'
+          command_timeout: 20m
+          source: image.tar.gz,image.sha256
+          target: /tmp/page3d-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: Verify and import transferred image
+        if: inputs.direct_transfer
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          TRANSFER_DIR: /tmp/page3d-${{ github.run_id }}-${{ github.run_attempt }}
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: '22'
+          command_timeout: 10m
+          envs: TRANSFER_DIR
+          script: |
+            set -eu
+            cd "$TRANSFER_DIR"
+            trap 'rm -f image.tar.gz image.sha256; rmdir "$TRANSFER_DIR" || true' EXIT
+            sha256sum -c image.sha256
+            docker load -i image.tar.gz
       - name: Deploy with project-scoped rollback
         uses: appleboy/ssh-action@v1.2.0
         env:
