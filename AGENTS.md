@@ -55,3 +55,5 @@
 - `Dockerfile` / `compose.yaml` 提供独立静态部署，AI 使用完整 URL；`.github/` 保留原站点入口代理与兼容回滚。
 
 - GitHub 远程为 `neo-jack/page3d`，公开仓库、master 主分支；主分支以独立项目初始提交重建，重写前历史保存在本机 `.git/history-backups/` 的 Git bundle 中，不发布备份引用。上传默认仅 CI，部署需仓库变量 DEPLOY_ENABLED=true。
+
+- HTML 通过 media="(min-width: 901px)" 预加载简介板 WebP，与 IntroductionBoard 的 picture 断点及静态导入共用同一哈希资源，移动端不得额外下载板图。

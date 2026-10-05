@@ -2,7 +2,12 @@ import { Component, Suspense, lazy, useRef, type ComponentProps, type ReactNode 
 import type { Group } from 'three';
 import SceneWarmup from './SceneWarmup';
 
-const AboutRoom = lazy(() => import('./about/AboutRoom'));
+const loadAbout = () => import('./about/AboutRoom');
+const AboutRoom = lazy(loadAbout);
+export function prefetchCorridorCode() {
+  // The actual lazy render still reports failures through CorridorBoundary.
+  void loadAbout().catch(() => {});
+}
 const ignoreProgress = () => {};
 
 class CorridorBoundary extends Component<{

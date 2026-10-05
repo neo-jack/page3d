@@ -3,7 +3,7 @@ import type { SyntheticEvent } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import EntranceDoors from '../../canvas/entrance/door/EntranceDoors.tsx';
-import DeferredCorridor from '../../canvas/DeferredCorridor.tsx';
+import DeferredCorridor, { prefetchCorridorCode } from '../../canvas/DeferredCorridor.tsx';
 import SceneWarmup from '../../canvas/SceneWarmup.tsx';
 import SceneActivity from '../../canvas/SceneActivity.tsx';
 import StartupLoader from '../loading/StartupLoader.tsx';
@@ -116,6 +116,7 @@ export function HomePage() {
   }, []);
 
   const handleSceneWarm = useCallback(() => {
+    prefetchCorridorCode();
     setSceneWarm(true);
   }, []);
   const handleStartupComplete = useCallback(() => setPageReady(true), []);

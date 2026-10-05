@@ -2,7 +2,7 @@ import { useSceneTexture } from '../../../utils/useSceneTexture';
 import assetCabinSketchBold from '../../../../public/fonts/CabinSketch-Bold.ttf?url';
 import assetRubikScribbleRegular from '../../../../public/fonts/RubikScribble-Regular.ttf?url';
 import balloonPopUrl from '../../../../public/sounds/paper-pop.mp3?url';
-import { useEffect, useMemo, useRef, type MutableRefObject } from 'react';
+import { useEffect, useMemo, useRef, useState, type MutableRefObject } from 'react';
 import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber';
 import { PositionalAudio, Text } from '@react-three/drei';
 import * as THREE from 'three';
@@ -27,6 +27,20 @@ const BALLOON_LAYOUT = [
   { x: 0.95, y: 0.75, height: 2.8, phase: 2.2 },
   { x: 0.1, y: -1.15, height: 2.3, phase: 4.1 },
 ];
+
+// Fixed six-image cache shared by corridor copies. Failed requests can retry on re-entry.
+const paintedLoads = new Map<string, Promise<THREE.Texture>>();
+function loadPainted(url: string) {
+  let pending = paintedLoads.get(url);
+  if (!pending) {
+    pending = new THREE.TextureLoader().loadAsync(url).then((texture) => {
+      texture.colorSpace = THREE.SRGBColorSpace;
+      return texture;
+    }).catch((error: unknown) => { paintedLoads.delete(url); throw error; });
+    paintedLoads.set(url, pending);
+  }
+  return pending;
+}
 
 export default function TechStackBalloons({ technologies, appearance, timeRef, lockedRef, enabled }: Props) {
   const title = useRef<THREE.Object3D & { fillOpacity: number }>(null);
@@ -67,15 +81,24 @@ function TechnologyBalloon({ technology, index, appearance, timeRef, lockedRef, 
   const config = TECHNOLOGY_BALLOONS[technology];
   const layout = BALLOON_LAYOUT[index % BALLOON_LAYOUT.length];
   const touch = isTouchDevice();
-  const [sketch, painted] = useSceneTexture([
-    config.sketch,
-    touch ? config.sketch : config.painted,
-  ]);
+  const sketch = useSceneTexture(config.sketch);
+  const [painted, setPainted] = useState<THREE.Texture | null>(null);
+  useEffect(() => {
+    if (!enabled || touch) return;
+    let cancelled = false;
+    void loadPainted(config.painted).then((texture) => {
+      if (!cancelled) setPainted(texture);
+    }).catch(() => {
+      // Optional hover colour must never suspend or remove the usable corridor.
+    });
+    return () => { cancelled = true; };
+  }, [config.painted, enabled, touch]);
   const outer = useRef<THREE.Group>(null);
   const inner = useRef<THREE.Group>(null);
   const body = useRef<THREE.Group>(null);
   const reveal = useRef<RevealBasicMaterial>(null);
   const paintedMaterial = useRef<THREE.MeshBasicMaterial>(null);
+  const paintedLayer = useRef<THREE.Mesh>(null);
   const label = useRef<THREE.Object3D & { fillOpacity: number; outlineOpacity: number }>(null);
   const gl = useThree((state) => state.gl);
   const pointerLocal = useMemo(() => new THREE.Vector3(), []);
@@ -92,8 +115,8 @@ function TechnologyBalloon({ technology, index, appearance, timeRef, lockedRef, 
   ), [sketch, enabled, lockedRef, appearance]);
 
   useEffect(() => {
-    sketch.colorSpace = painted.colorSpace = THREE.SRGBColorSpace;
-  }, [sketch, painted]);
+    sketch.colorSpace = THREE.SRGBColorSpace;
+  }, [sketch]);
   useEffect(() => () => {
     popTimeline.current?.kill();
     paintTween.current?.kill();
@@ -110,6 +133,9 @@ function TechnologyBalloon({ technology, index, appearance, timeRef, lockedRef, 
       ease: 'power2.out',
     });
   };
+  useEffect(() => {
+    if (painted && hovered.current && interactive()) setPaint(1);
+  }, [painted]);
   const leave = () => {
     hovered.current = false;
     targetMagnet.set(0, 0);
@@ -161,6 +187,7 @@ function TechnologyBalloon({ technology, index, appearance, timeRef, lockedRef, 
     const alpha = appearance.opacity * (1 - animation.current.pop);
     if (reveal.current) reveal.current.opacity = alpha;
     if (paintedMaterial.current) paintedMaterial.current.opacity = (reveal.current && reveal.current.uProgress > 0.001 ? alpha : 0);
+    if (paintedLayer.current) paintedLayer.current.visible = !!painted && (paintedMaterial.current?.opacity ?? 0) > 0;
     if (label.current) {
       label.current.fillOpacity = appearance.opacity * animation.current.labelOpacity;
       label.current.outlineOpacity = appearance.opacity * animation.current.labelOpacity;
@@ -171,9 +198,9 @@ function TechnologyBalloon({ technology, index, appearance, timeRef, lockedRef, 
     <group ref={outer} name={`technology-balloon:${technology}`}>
       <group ref={inner}>
         <group ref={body}>
-          <mesh renderOrder={2}>
+          <mesh ref={paintedLayer} visible={false} renderOrder={2}>
             <planeGeometry args={[layout.height * config.aspect, layout.height]} />
-            <meshBasicMaterial ref={paintedMaterial} map={painted} color="#e0e0e0" transparent opacity={0} depthWrite={false} side={THREE.DoubleSide} />
+            <meshBasicMaterial ref={paintedMaterial} map={painted ?? sketch} color="#e0e0e0" transparent opacity={0} depthWrite={false} side={THREE.DoubleSide} />
           </mesh>
           <mesh position={[0, 0, 0.01]} renderOrder={3} raycast={raycast} onClick={pop}
             onPointerOver={(event) => {
@@ -181,7 +208,7 @@ function TechnologyBalloon({ technology, index, appearance, timeRef, lockedRef, 
               event.stopPropagation();
               hovered.current = true;
               gl.domElement.style.cursor = 'pointer';
-              setPaint(1);
+              if (painted) setPaint(1);
             }}
             onPointerOut={leave}
             onPointerMove={(event) => {

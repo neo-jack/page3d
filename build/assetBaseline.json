@@ -248,11 +248,11 @@
       "sha256": "8c1544cb26fb514f4f4ab9966752c41d85094cf2fb89131fdbaca11a296cf943"
     },
     {
-      "file": "textures/about/hanging-board.png",
+      "file": "textures/about/hanging-board.webp",
       "width": 1536,
       "height": 1024,
       "rgbaSha256": "380fc01109e0eb0fed1e691d2525c6d8d68ae9f5cb40916fbb84b82995edaad8",
-      "sha256": "3085bff4a8eb50bac17fd6a1ab1536c05f491553e41df65b547a62725d1f4e3b"
+      "sha256": "e0114738f59eedb2ec7a51cadef41fb8e8b3fd765ee3bbfe4e7833228a8b2514"
     },
     {
       "file": "textures/about/htmlmalybalon.webp",

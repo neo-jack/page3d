@@ -33,3 +33,5 @@
 - AI 宠物与客户端工具由版本化 @my-page/ai-pet 包维护；本项目保留消费端协议测试，服务地址见 src/data/integrations.ts，不导入后端源码。
 
 - 走廊就绪由 `corridorReady` 单独记录；`prepareEntry` 返回 Promise，提前点门显示准备提示，就绪后自动进入，失败只提示走廊不可用并保留入口。回调保持稳定，卸载时拒绝未完成请求。作品详情通过 lazy 在首次进门后加载，不进入首屏主包。
+
+- 入口 SceneWarmup 完成后立即调用 prefetchCorridorCode，与揭幕并行下载走廊模块；实际挂载仍等待 pageReady，不能让走廊图片回到首屏加载门禁。

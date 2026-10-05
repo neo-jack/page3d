@@ -9,7 +9,7 @@
 - `entrance/door/EntranceDoors.tsx` — 当前入口门场景，负责门、门框、门前地面和入口墙；物品分类与维护边界见 `entrance/AGENTS.md`。
 - `entrance/wall/EntranceWall.tsx` — 用三块墙板围出门洞，保持门后场景可见。
 - `SceneWarmup.tsx` — 等待 3D 字形、分批上传纹理、编译材质并离屏预渲染；可通过 scope 限定后台预热子树。
-- `DeferredCorridor.tsx` — 揭幕后 lazy 加载 About，使用独立 Suspense、错误边界与隐藏组，后台预热完成后显示。
+- `DeferredCorridor.tsx` — 入口预热完成时预取 About 代码，揭幕后挂载，使用独立 Suspense、错误边界与隐藏组，后台预热完成后显示。
 - `SceneActivity.tsx` — 统一管理页面隐藏时的场景时钟、渲染循环和 GSAP 暂停恢复，挂载在资源 Suspense 外。
 - `about/AboutRoom.tsx` — 关于场景入口，负责滚动输入、飞行姿态和场景挂载。
 - `about/InfiniteSkyManager.jsx` — 云朵区块的动态管理。

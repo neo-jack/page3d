@@ -1,4 +1,4 @@
-import assetHangingBoard from '../../../../public/textures/about/hanging-board.png?url';
+import assetHangingBoard from '../../../../public/textures/about/hanging-board.webp?url';
 import type { SyntheticEvent } from 'react';
 import { reportStartupError } from '../../../utils/startup';
 
