@@ -20,6 +20,7 @@
 - `HomePage` 无路由或初始视图参数；`hasEntered` 初始为 `false`，由开门动画完成后设置为 `true`。
 - `hasEntered=true` 且未返回时给 `SiteShell` 传入返回主页回调；点击后设置独立的 `isReturningHome`，关闭详情、隐藏返回按钮和飞行提示，保持 `hasEntered=true` 与首屏 DOM 隐藏。由 `EntranceDoors` 倒退镜头、关门后调用 `onReturnHomeComplete`，再清空入口和飞行状态、恢复首屏内容，不能点击后立即复位相机或滚动进度。Canvas 和场景保持挂载，不重启加载层，不清除声音偏好；飞行提示每次进门重置，不持久化关闭状态。验证须覆盖飞行后返回、再次进门、作品聚焦途中返回及窄屏返回。
 - Canvas 外层现在包含简介板的 HTML，不设置 `aria-hidden`，避免向辅助技术隐藏简介正文。
+- 入口门同时接收 `IntroductionBoard` 和 `PortfolioWallCard` 两个墙面 DOM 节点；前者只显示“个人作品集”门牌，后者展示 `data/site.ts` 的公开项目入口。两者都由 Canvas 内的 `Html transform` 定位，不改成视口固定层。
 - AI 对话使用独立 `z-45` portal，打开时高于导航，保证浮层向屏幕顶部扩展时关闭和输入控件不被导航遮挡；具体顶部锚点、尺寸与紧凑布局由 已安装宠物包的说明 维护。
 - 探索提示只在等待点击门时显示，进门动画开始后隐藏；纸条标题“探索”与正文分行，正文显示“点击物品进行交互,点击门进入作品集空中走廊”；桌面纸条最大宽 23rem、正文 0.8rem、标题 0.92rem、上下内边距 0.75rem，600px 及以下正文 0.7rem、标题 0.8rem、上下内边距 0.625rem，宽度保留视口边距并允许自然换行；纸条使用原始 floor_paper 纹理和近白底色，不叠加染色渐变；正文深灰、标题近黑，保留细锯齿描边与轻阴影，不包含声音状态或音量开关，也不消费 `AudioManager`；提示层保持 `pointer-events-none`，避免阻断门的 Canvas 点击。
 - `sceneWarm` 由 Canvas 内的 `SceneWarmup` 回调设置；`pageReady` 在纸张揭幕完成后设置，入口门的 `canEnter` 必须同时满足两个状态。

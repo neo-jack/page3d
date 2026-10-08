@@ -6,7 +6,7 @@
 
 ### Important files
 
-- `EntranceDoors.tsx` — 入口主组件，处理纹理加载、门悬停/点击、右侧窗户草图、简介板墙面锚点、GSAP 开门和相机飞入；通过点击门禁后、动画开始前调用 `onEnterStart`，完成后调用 `onEnter`；`canEnter=false` 时不响应悬停和点击。
+- `EntranceDoors.tsx` — 入口主组件，处理纹理加载、门悬停/点击、右侧窗户草图、简介板与项目卡片的墙面锚点、GSAP 开门和相机飞入；通过点击门禁后、动画开始前调用 `onEnterStart`，完成后调用 `onEnter`；`canEnter=false` 时不响应悬停和点击。
 
 ### Implementation notes
 
@@ -16,6 +16,7 @@
 - 入口相机在 Canvas 宽度 ≤600px 时按约 3.8 世界单位横向范围适配，让移动端镜头前移、突出大门；其他尺寸沿用 7.4 的取景范围，最近距离仍为初始机位到门的距离。仅在入口可见且未开门时更新距离，返回首页共用此机位计算。窄屏纸质地面只向相机方向延长，保持门口后边界和纹理密度，墙板同步增高；侧墙延伸至 `groundY`，门洞仍以 `floorY` 门槛为准，不能因补背景封住门洞。
 - `isReturningHome=true` 时入口重新可见但保持开门，从当前实际相机位置/四元数用 GSAP 倒退 1.84 秒至按当前宽高比适配的首页机位，再用 0.65 秒关门；整条时间线完成后调用 `onReturnHomeComplete`。返回期间禁用入口交互和静态机位适配，不允许 `enabled=true` 触发瞬间复位；减少动态效果时两段各缩短至 0.01 秒。切换阶段和卸载时清理转场 timeline 与门的悬停 tween；返回途中调整窗口时从实时机位接续到新适配位置，完成后允许重复进入。
 - 简介板内容由 `introductionBoard` prop 传入，使用 Drei `Html transform` 居中锚定在门框上方的墙面局部坐标 `[0, 1.7, wallThickness / 2 + 0.01]`，板底与门框保留间隙。板面与文字一起参与相机透视，不能改回屏幕固定定位或朝向相机的 sprite。DOM 样式与文案由 `../../../dom/board/IntroductionBoard.tsx` 维护。
+- 右墙项目画廊由 `portfolioWallCard` prop 传入，使用独立的 Drei `Html transform` 锚定在入口右墙 `[3, 1.52, wallThickness / 2 + 0.012]`，`scale={0.74}`；内部 DOM 以更大绘制尺寸渲染后缩回墙面尺寸，提升中文项目牌清晰度。DOM 总宽 1920px、列间距 40px，五个竖向 A4 画框横向一排排列，使用独立的不透明项目牌，整体停在窗户上沿并留出间隙，项目名称允许自然换行，右侧为宠物入口留出边距，链接保持 `pointerEvents="auto"`，入口关闭或相机飞入后随 `enabled` 卸载，不能改成视口固定导航。
 - 简介板 `distanceFactor={1}`、`scale={1.5}` 与 DOM 的 700px 宽、28px 字号成对使用：以两倍 CSS 尺寸绘制后缩回原墙面尺寸，减轻透视合成的文字模糊；不要只改一侧缩放，也不要通过提高 Canvas DPR 修复独立 HTML 文字。验证清晰度时同时核对板面位置、尺寸、换行与进门透视。
 - `Html` 保持点击穿透，不使用正片叠底或整体透明度，简介板须挡住下方 Canvas 墙纹；低层级 `zIndexRange` 避免覆盖站点控件。相机经过墙面后由 `Html` 自动隐藏；入口 `enabled=false` 时卸载该 DOM，因为 Three.js 父组的 `visible` 不会自动隐藏 HTML。
 - 简介板在加载阶段就挂载，不能受 `canEnter` 或 `pageReady` 限制，否则图片解码与揭幕就绪条件会互相等待。验证应包含进门中途板面放大并离开原屏幕位置、越过墙面后隐藏及移动端不下载板图。

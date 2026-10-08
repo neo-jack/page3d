@@ -10,7 +10,7 @@ interface IntroductionBoardProps {
 export default function IntroductionBoard({ onLoad }: IntroductionBoardProps) {
   return (
     <div
-      className="pointer-events-none relative aspect-3/2 w-175 max-[900px]:hidden"
+      className="pointer-events-none relative aspect-3/2 w-160 scale-y-[0.9] max-[900px]:hidden"
       style={{ fontFamily: '"mono", "PingFang SC", "Microsoft YaHei", sans-serif' }}
       aria-label="作品集简介"
     >
@@ -29,15 +29,9 @@ export default function IntroductionBoard({ onLoad }: IntroductionBoardProps) {
           onError={() => reportStartupError(new Error('Failed to load the introduction board'))}
         />
       </picture>
-      {/* 标题与方向列表单独绘制，不叠加亚像素阴影，避免细笔画出现重影。 */}
-      <div className="absolute inset-x-[10%] top-[39%] bottom-[12%] flex flex-col items-center justify-center text-center text-[28px] font-normal leading-[1.35] text-[#41443f]">
+      {/* 门牌只保留作品集名称，具体项目入口由右侧纸质卡片承载。 */}
+      <div className="absolute inset-x-[10%] top-[39%] bottom-[12%] flex items-center justify-center text-center text-[26px] font-normal leading-[1.35] text-[#41443f]">
         <h2 className="text-[1.15em] font-normal">个人作品集</h2>
-        <ul className="mt-1 w-full list-none space-y-0.5 p-0">
-          <li>- 3D网站 -</li>
-          <li>- React源码核心 -</li>
-          <li>- Ai工作流（像素化还原ui） -</li>
-          <li>- 界面元素选择器 -</li>
-        </ul>
       </div>
     </div>
   );

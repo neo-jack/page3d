@@ -41,6 +41,7 @@ interface EntranceDoorsProps {
   canEnter?: boolean;
   prepareEntry?: () => Promise<void>;
   introductionBoard?: ReactNode;
+  portfolioWallCard?: ReactNode;
   petMode: PaperPetMode;
   petVisible: boolean;
   petPanelOpen: boolean;
@@ -87,6 +88,7 @@ const EntranceDoors: React.FC<EntranceDoorsProps> = ({
   canEnter = true,
   prepareEntry,
   introductionBoard,
+  portfolioWallCard,
   petMode,
   petVisible,
   petPanelOpen,
@@ -492,11 +494,24 @@ const EntranceDoors: React.FC<EntranceDoorsProps> = ({
           position={[0, 1.7, wallThickness / 2 + 0.01]}
           distanceFactor={1}
           // DOM 宽度与字号按两倍绘制，原 scale=3 减半以保持板面世界尺寸。
-          scale={1.5}
+          scale={1.35}
           pointerEvents="none"
           zIndexRange={[1, 0]}
         >
           {introductionBoard}
+        </Html>
+      )}
+
+      {enabled && portfolioWallCard && (
+        <Html
+          transform
+          position={[3, 1.52, wallThickness / 2 + 0.012]}
+          distanceFactor={1}
+          scale={0.74}
+          pointerEvents="auto"
+          zIndexRange={[4, 1]}
+        >
+          {portfolioWallCard}
         </Html>
       )}
 

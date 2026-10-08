@@ -8,6 +8,7 @@ import SceneWarmup from '../../canvas/SceneWarmup.tsx';
 import SceneActivity from '../../canvas/SceneActivity.tsx';
 import StartupLoader from '../loading/StartupLoader.tsx';
 import IntroductionBoard from '../board/IntroductionBoard.tsx';
+import PortfolioWallCard from '../board/PortfolioWallCard.tsx';
 import FlightGestureHint from '../flight/FlightGestureHint.tsx';
 import { PaperPetTrigger, PaperPetReply, usePaperPet } from '@my-page/ai-pet';
 import { SiteShell } from '../../ui/SiteShell.tsx';
@@ -159,6 +160,7 @@ export function HomePage() {
               canEnter={sceneWarm && pageReady && !isReturningHome}
               prepareEntry={prepareEntry}
               introductionBoard={<IntroductionBoard onLoad={handleIntroBoardLoad} />}
+              portfolioWallCard={<PortfolioWallCard />}
               petMode={pet.mode}
               petVisible={!mobileScene}
               petPanelOpen={pet.panelOpen}

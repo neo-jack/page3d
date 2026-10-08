@@ -6,7 +6,7 @@
 
 ### Important files
 
-- `textures/` — 门窗、花坛、云层、气球、纸纹、卡面与卷轴；按近旁 AGENTS.md 维护。
+- `textures/` — 门窗、花坛、云层、气球、纸纹、卡面、入口画廊图稿与卷轴；按近旁 AGENTS.md 维护。
 - `fonts/` — DOM 和 Three.js 文字使用的本地字体，字节保持不变。
 - `sounds/` — 气球单次爆破声及已停用的风声源文件，来源、发布状态、处理方式与指纹见该目录说明；`bgm.mp3` 为独立背景音乐。
 - `icon.svg`、`apple-icon.png` — 透明蓝色 L 品牌图标，由 `src/App.tsx` 导入；Apple 图标为 512×512 PNG。

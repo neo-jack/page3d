@@ -9,6 +9,8 @@
 - `preview-button.webp` — imgaier 文生图重新生成的冷灰白皱纸与无字铅笔双线边框，用于所有笔记正文预览按钮；从生成 PNG 无损转码，RGBA 基线存于 `../../../build/assetBaseline.json`。`NoteMarkdown.tsx` 静态导入，通过居中背景纵向放大收起上下留白、multiply 混合纸色；按钮文字由 DOM 显示。
 
 - `react-core-zh.webp`、`design-workflow-zh.webp`、`context-tool-zh.webp` — 当前三项作品的完整中文卡面，约 1097×1434，包含纸纹、双线边框、标题、示意图、分类和“探索作品”按钮。
+- `gallery-art-sheet.png` — imgaier 参考入口墙纸纹与挂板生成的 3×2 淡墨设色中国画作品图稿，不烘焙文字，作为六张竖版图的生成源；山水、卷轴、云水和设色留白与入口白砖纸墙统一。
+- `gallery-art-01.png` … `gallery-art-06.png` — 从统一图稿导出的六张竖向 A4 纸张图，入口画廊按 05、06、04、02、03 顺序展示五个项目，01 保留为备用；页面采用低饱和暖白色调，不透明渲染且不与墙纹叠底，牌子由 DOM 渲染，具体样式见 src/components/dom/board/AGENTS.md。
 - `button.webp` — 现有素描按钮源文件，DOM 详情已不再引用，不进入发布包；原参考来自 `res/ref/public/textures/gallery/przyciskdotylukartki.webp`。已用 imgaier 参考编辑，微调空白框的双线和角部，保持 1024×256；保持当前半透明边缘。中文卡片按钮取样完整卡面。
 - `public/THIRD-PARTY-NOTICES.txt` — 上游按钮纹理的 MIT 许可，发布时保留。
 
@@ -21,3 +23,4 @@
 - 卡面顶部统一“编号 / 精选作品”，底部统一“探索作品”；两行标题和分类烘焙在卡面图片内，Markdown 头部仅保留详情标题 `title`，不再配置 `coverTitle` 或 `category`。修改卡面文案时更新图片，并核对对应笔记标题与浏览、聚焦状态；详情不展示卡面的编号或分类。
 
 - `context-tool-zh.webp` 的标题为“界面元素 / 选择器”，插图为浏览器选框到 AI 上下文，标注“选择元素 / 交给 AI”；通过 imgaier 参考编辑原卡面后无损编码，当前像素基线见 `../../../build/assetBaseline.json`。
+- `gallery-art-sheet.png` 保留生成图的 1536×1024 PNG 像素；六张 `gallery-art-*.png` 保留 512×725 竖向纸张比例，入口画框固定 `210 / 297` 的 A4 外框，不得改回方形画框。

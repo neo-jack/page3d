@@ -31,6 +31,55 @@
       "sha256": "b6158134680bd03ca6b2eb9c247111733623dd79ee743486f931f94b1b2960f1"
     },
     {
+      "file": "textures/portfolio/gallery-art-sheet.png",
+      "width": 1536,
+      "height": 1024,
+      "rgbaSha256": "514ca69528ceb9725fb35954fa0293e5069cb4cda037853d61cf882be80e8401",
+      "sha256": "47990e95634958281e6edf12462c037c3dc033b7666697a352526bdd7054179d"
+    },
+    {
+      "file": "textures/portfolio/gallery-art-01.png",
+      "width": 512,
+      "height": 725,
+      "rgbaSha256": "33ccd125bf65c113ba69c1adb744ff9b1dab92921e523372e5ca398cd9a8aae8",
+      "sha256": "b840915246699b3b9e86ba553713a07f743ce79aac8978d5ab54e029ae642306"
+    },
+    {
+      "file": "textures/portfolio/gallery-art-02.png",
+      "width": 512,
+      "height": 725,
+      "rgbaSha256": "14e25f9761c4718e2917a1d70ee8b1491dca38aab03b12960eea2ff6246ae4d8",
+      "sha256": "0f4ab074d234eb57a5a4a64f6566257673d83d12260a33cede9a9fef281ae695"
+    },
+    {
+      "file": "textures/portfolio/gallery-art-03.png",
+      "width": 512,
+      "height": 725,
+      "rgbaSha256": "71133462af13aa70ba0e47c22b0121deaf9e9956de6b299580bc4aa655ca31a1",
+      "sha256": "e133af03b0de2929b0c5de48614a481a1f39ac60dd52ca5781343944ac625cfc"
+    },
+    {
+      "file": "textures/portfolio/gallery-art-04.png",
+      "width": 512,
+      "height": 725,
+      "rgbaSha256": "43420a36db6a9c83fc4bfe1b6cdfb24a6c7814ed2f8b05019e40f6a3ffba9553",
+      "sha256": "65975e1b4e70f1aead4b2e436a59902d30d9609881a47ee2e49029e19c8e95b5"
+    },
+    {
+      "file": "textures/portfolio/gallery-art-05.png",
+      "width": 512,
+      "height": 725,
+      "rgbaSha256": "64cb2c7c80a732d0e379e18f2ae2dc0d56c98372dc2cf25cefddca64c2d402de",
+      "sha256": "031ea06e16121c8fac06fb02ef419816b0f804c920a1d443addbab5f30012694"
+    },
+    {
+      "file": "textures/portfolio/gallery-art-06.png",
+      "width": 512,
+      "height": 725,
+      "rgbaSha256": "2abc47d13cba96b86b4ec6aa23408133dac1521cf9ddd700d202762c5702a0c2",
+      "sha256": "82a0b928a78749ee33a2a86671ec72893c57da00f035216d568164da73e3d646"
+    },
+    {
       "file": "textures/portfolio/design-workflow-zh.webp",
       "width": 1097,
       "height": 1434,
