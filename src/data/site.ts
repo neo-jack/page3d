@@ -15,8 +15,8 @@ export const PORTFOLIO_WALL_LINKS: PortfolioWallLink[] = [
     href: `${PUBLIC_SITE_ORIGIN}/Ai/`,
   },
   {
-    label: 'Dify版竞品分析',
-    href: 'https://udify.app/chat/yThW4zLWJNWbHdTD',
+    label: '2D个人页面',
+    href: LEGACY_SITE_URL,
   },
   {
     label: '前端监控',

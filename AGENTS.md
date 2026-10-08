@@ -17,7 +17,7 @@
 - `src/App.tsx` — 单页挂载、Context Provider 和文档元信息入口。
 - `src/components/` — Canvas、DOM 和 UI 组件，按最近层级 `AGENTS.md` 维护。
 - `src/data/note/` — 工程笔记和作品介绍的统一 Markdown 内容目录，图片/视频可与笔记同目录，细则见其 AGENTS.md。
-- `src/data/site.ts` — 线上站点公开入口与旧版 2D 绝对链接的唯一来源，由 Vite 代理和站点导航共用。
+- `src/data/site.ts` — 线上站点公开入口与 2D 个人页面绝对链接的唯一来源，由 Vite 代理和墙面项目卡片共用。
 - `src/context/` — 场景音效偏好 Context，按其 `AGENTS.md` 维护。
 - `src/shaders/` — 唯一的自定义揭示材质实现，按其 `AGENTS.md` 维护。
 - `src/utils/` — 浏览器运行工具，按其 `AGENTS.md` 维护。

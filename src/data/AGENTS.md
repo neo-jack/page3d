@@ -8,12 +8,12 @@
 
 - `note/` — 工程笔记与作品统一 Markdown 来源，场景配置由其 `catalog.json` 维护；具体写法与媒体规则见 `note/AGENTS.md` 和 `note/README.md`。
 - `technologyBalloons.ts` — 技术栈气球的素描/彩绘资源映射和 key 类型，不保存作品文案。
-- `site.ts` — 线上站点域名入口、旧版 2D 绝对链接和入口墙面的公开项目链接；Vite 开发/预览代理与 `ui/SiteShell.tsx` 共用，不包含模型网关或凭据。
+- `site.ts` — 线上站点域名入口、2D 个人页面绝对链接和入口墙面的公开项目链接；Vite 开发/预览代理与墙面项目卡片共用，不包含模型网关或凭据。
 
 ### Implementation notes
 
 - 公开站点地址默认由根 site.config.json 提供，VITE_SITE_ORIGIN 可覆盖，site.ts 负责导出导航使用的地址；AI 接入使用 integrations.ts 的 VITE_AI_ENDPOINT。开发代理可配置本地或远程服务，模型凭据始终留在后端。
-- `PORTFOLIO_WALL_LINKS` 只维护已确认的公开项目入口和墙面展示名称，当前顺序为 AI竞品分析、Agent Dify版竞品分析、前端监控、miniReact源码、原生选择器；新增项目时核对公开部署事实，不写入私有服务地址、本地源码路径或凭据。
+- `PORTFOLIO_WALL_LINKS` 只维护已确认的公开项目入口和墙面展示名称，当前顺序为 AI竞品分析agent、2D个人页面、前端监控、miniReact源码、元素选择器；新增项目时核对公开部署事实，不写入私有服务地址、本地源码路径或凭据。
 - 详情不提供固定的发布按钮；实际发布链接通过 Markdown 正文维护，不虚构尚未上线地址。
 - 卡面标题、分类、插图标注和“探索作品”入口使用中文（React 等技术专名保留原文），由 imgaier 烘焙进完整卡面；修改卡面文案时同步重新生成对应封面，不能只改数据。
 - 中文名称和完整介绍继续在 DOM 层展示；卡片不使用 Troika 绘制中文，也不请求在线中文字库。

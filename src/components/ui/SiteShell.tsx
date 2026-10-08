@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useAudio } from '../../context/AudioManager.tsx';
-import { LEGACY_SITE_URL } from '../../data/site.ts';
 import PerformancePanel from './PerformancePanel';
 
 type SiteShellProps = {
@@ -101,9 +100,6 @@ export function SiteShell({ children, onReturnHome }: SiteShellProps) {
         }}>
         性能[{performanceOpen ? '|' : '/'}]
       </button>
-      <a className={[navButtonClass, 'normal-case'].join(' ')} href={LEGACY_SITE_URL} onClick={() => setMenuOpen(false)}>
-        旧版[/]
-      </a>
       {onReturnHome && (
         <button
           className={navButtonClass}

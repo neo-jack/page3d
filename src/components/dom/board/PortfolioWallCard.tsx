@@ -5,7 +5,7 @@ import assetGalleryArt02 from '../../../../public/textures/portfolio/gallery-art
 import assetGalleryArt03 from '../../../../public/textures/portfolio/gallery-art-03.png?url';
 import { PORTFOLIO_WALL_LINKS } from '../../../data/site';
 
-// 画面顺序与墙牌顺序一致：竞品研究、Dify、监控、miniReact、原生选择器。
+// 画面顺序与墙牌顺序一致：竞品研究、2D个人页面、监控、miniReact、原生选择器。
 const galleryArt = [assetGalleryArt05, assetGalleryArt06, assetGalleryArt04, assetGalleryArt02, assetGalleryArt03];
 
 /** 入口右墙的纸质画廊；由 EntranceDoors 以 Html transform 贴在墙面。 */
