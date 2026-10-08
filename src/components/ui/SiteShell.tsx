@@ -28,6 +28,8 @@ function cx(...parts: Array<string | false | null | undefined>) {
 export function SiteShell({ children, onReturnHome }: SiteShellProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [performanceOpen, setPerformanceOpen] = useState(false);
+  const [returnHintVisible, setReturnHintVisible] = useState(false);
+  const canReturnHome = Boolean(onReturnHome);
   const menuRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const brandRef = useRef<HTMLSpanElement>(null);
@@ -35,6 +37,13 @@ export function SiteShell({ children, onReturnHome }: SiteShellProps) {
   const { bgmOn, toggleBgm } = useAudio();
 
   const panelBackground = 'rgba(251, 250, 244, 0.92)';
+
+  useEffect(() => {
+    setReturnHintVisible(canReturnHome);
+    if (!canReturnHome) return;
+    const timeout = window.setTimeout(() => setReturnHintVisible(false), 5000);
+    return () => window.clearTimeout(timeout);
+  }, [canReturnHome]);
 
   useEffect(() => {
     // 壳层快捷键：背景音乐控制
@@ -108,6 +117,13 @@ export function SiteShell({ children, onReturnHome }: SiteShellProps) {
           }}
         >
           返回[/]
+          <span
+            aria-hidden="true"
+            className={cx(
+              'pointer-events-none absolute -inset-2 rounded-sm border border-[#929487]/75 bg-[#f5f4ed]/15 transition-opacity duration-500 motion-reduce:transition-none',
+              returnHintVisible ? 'opacity-100' : 'opacity-0',
+            )}
+          />
         </button>
       )}
     </>

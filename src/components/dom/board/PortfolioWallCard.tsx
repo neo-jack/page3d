@@ -23,7 +23,7 @@ export default function PortfolioWallCard() {
             href={link.href}
             target="_blank"
             rel="noreferrer"
-            className="group min-w-0 text-center text-[#52584d] no-underline focus-visible:outline-2 focus-visible:outline-dotted focus-visible:outline-[#52584d]"
+            className="group min-w-0 text-center text-[#70766a] no-underline focus-visible:outline-2 focus-visible:outline-dotted focus-visible:outline-[#52584d]"
             aria-label={link.label}
           >
             <span className="relative block aspect-[210/297] overflow-hidden border-[3px] border-[#929487]/50 bg-[#f5f4ed] shadow-none transition-transform duration-150 group-hover:-translate-y-0.5 group-focus-visible:-translate-y-0.5">
@@ -37,7 +37,7 @@ export default function PortfolioWallCard() {
               <span aria-hidden="true" className="pointer-events-none absolute inset-[5%] border border-[#929487]/50" />
             </span>
             <span
-              className="relative mt-2 flex min-h-28 items-center justify-center whitespace-normal border-[1.5px] border-[#929487]/50 bg-[#f5f4ed] px-3 py-2 text-center text-[52px] text-balance font-normal leading-[1.12] text-[#52584d] shadow-none"
+              className="relative mt-2 flex min-h-28 items-center justify-center whitespace-normal border-[1.5px] border-[#929487]/50 bg-[#f5f4ed] px-3 py-2 text-center text-[52px] text-balance font-normal leading-[1.12] text-[#70766a] shadow-none"
               style={{ clipPath: 'polygon(1% 8%, 98% 0%, 100% 88%, 3% 100%, 0% 18%)' }}
             >
               <i aria-hidden="true" className="absolute left-1 top-1/2 size-1 -translate-y-1/2 rounded-full border border-[#6f6b5e]/75 bg-[#c4bfae]/70" />
