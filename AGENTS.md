@@ -9,8 +9,8 @@
 - `README.md` — GitHub 项目入口，沿用 miniReact 的简洁结构：项目简介、在线体验、快速开始、构建与验证；标题使用 GitHub 仓库名，只保留必要接入配置，不混入本机目录编号、迁移记录或提交历史说明。
 
 - `package.json` — 依赖、Vite 脚本和运行时入口。
-- `index.html` — 包含内联纸张加载画面的 HTML 壳和 `#root` 挂载点，在主包下载前即可绘制；双圆环半径 44.6/34.8、周期 10.4/4.2 秒，左右纸张中的 SVG 保持一致；加载失败不展示提示文案或重试按钮。 同时静态声明 `/public/icon.svg`，由 Vite 重写为哈希地址并供 `App.tsx` 复用，避免主包执行前请求缺失的 `/favicon.ico`。
-- `index.html` 底部的内联模块 — 轻量启动入口，调用 `src/utils/startup.ts` 启动加载状态后动态导入 `src/App.tsx`，并捕获主包加载失败。
+- `index.html` — 包含内联纸张加载画面的 HTML 壳和 `#root` 挂载点，在主包下载前即可绘制；双圆环半径 44.6/34.8、周期 10.4/4.2 秒，左右纸张中的 SVG 保持一致；普通资源加载失败不展示提示文案或重试按钮，WebGL/场景渲染故障由 `dom/home/SceneFallback.tsx` 提供独立兜底。 同时静态声明 `/public/icon.svg`，由 Vite 重写为哈希地址并供 `App.tsx` 复用，避免主包执行前请求缺失的 `/favicon.ico`。
+- `index.html` 底部的内联模块 — 轻量启动入口，仅桌面端调用 `src/utils/startup.ts` 启动加载状态后动态导入 `src/App.tsx`，并捕获主包加载失败。
 - `vite.config.js` — React、Tailwind、Markdown 内容与发布边界插件配置；生产关闭 source map、启用压缩，JS/CSS/媒体统一输出 `assets/[hash]` 文件名，禁用媒体内联；开发/预览的 `/api/ai` 由 AI_PROXY_TARGET 转发，默认公开站点；也可使用 VITE_AI_ENDPOINT 直接跨域连接独立 AI 服务。
 - `.github/workflows/3dpage-cicd.yml` — 本项目独立类型检查、构建、GHCR 镜像发布和 SSH 部署；保留入口 Nginx 的路由，2D/AI 容器不随 3D 业务修改重建。
 - `.github/deploy/cloudflare.md` — CDN 优化入口；Nginx 为哈希资源设置浏览器和边缘一年缓存，Cloudflare 账户需单独配置 `/assets/` 缓存资格，HTML/404 不缓存。
@@ -29,6 +29,8 @@
 - `vendor/` — 已版本化的宠物包；不读取相邻源码。
 
 ### Implementation notes
+
+- 移动端在 `index.html` head 内直接 `location.replace` 到公开站点 `/2D/`；以移动 UA、iPad 桌面模式和粗指针无悬停能力判断，横屏同样跳转，不单凭窗口宽度判定桌面端。目标由 Vite 根据 site.ts / VITE_SITE_ORIGIN 注入 `VITE_2D_URL`，不依赖加载 React、Three.js 或移动端本地 2D 服务。跳转标记同时阻止 App 动态导入和 3D 监控初始化，避免导航尚未完成时启动场景；保留桌面场景故障兜底。
 
 
 - 本地预览、构建和静态预览分别使用 `npm run dev`、`npm run build`、`npm run preview`；不要臆造额外流程。
@@ -49,7 +51,7 @@
 - 加载双圆环使用独立 HTML rotor 包裹静态 SVG，通过 CSS transform 与 will-change 提示合成层旋转；不要改回 SVG circle 内部动画或 JS 逐帧驱动。保持左右纸张图案、正反向周期一致，并保留错误暂停与减少动态效果偏好。验证时检查浏览器合成原因及主线程繁忙期间的旋转。
 
 - 等待期间使用纸张裁剪树外的独立圆环；纸张内两份圆环只在 revealing 时显示，保持同一动画周期与相位，让揭幕图案连续。避免将持续旋转层放回随进度重绘的裁剪纸张内。
-- `site.config.json` 与 `.env.example` 维护公开站点、AI 与监控地址；`src/data/integrations.ts` 读取 AI endpoint。模型 Key 不进入 VITE_*。
+- `site.config.json` 与 `.env.example` 维护公开站点、AI 与监控地址；生产公开来源使用 `https://www.lanbinquan.top`，`src/data/integrations.ts` 读取 AI endpoint。模型 Key 不进入 VITE_*。
 - 宠物实现属于 @my-page/ai-pet；HomePage 消费 hook / 面板和 sites 配置，EntranceDoors 消费 /three 模型，页面只实现动作白名单回调。
 - 包来源是独立 AI 仓库，更新时复制新版本 tgz 并 npm install 锁定；包没有公开发布，不使用跨目录 file 链接。
 - `Dockerfile` / `compose.yaml` 提供独立静态部署，AI 使用完整 URL；`.github/` 保留原站点入口代理与兼容回滚。

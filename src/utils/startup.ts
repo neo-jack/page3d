@@ -25,6 +25,17 @@ export function startStartup() {
   paintProgress(1);
 }
 
+// The scene failure screen replaces startup instead of pretending the scene is ready.
+export function showStartupFallback() {
+  failed = true;
+  getLoader()?.remove();
+  const root = document.getElementById('root');
+  if (root) {
+    root.inert = false;
+    root.setAttribute('aria-busy', 'false');
+  }
+}
+
 // Task-weighted progress: downloads, DOM fonts, then text/texture/GPU preparation.
 // A finished network batch can never release the loading screen by itself.
 export function setStartupProgress(stage: Stage, value: number) {

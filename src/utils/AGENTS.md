@@ -21,7 +21,7 @@
 - `readFollowUpQuestions` 仅解析完整且唯一的 FollowUp 围栏，严格校验 2–3 个不重复、2–60 字的问题；缺失或非法时返回空列表。不得基于提问、回复关键词或固定模板补卡片、补追问；后端负责模型输出校验和补全。
 - 聊天会话不持久化；收藏功能已移除，工具不读取、写入或迁移旧收藏数据。
 - `startup.ts` 不导入 React/Three.js；进度按资源、DOM 字体与场景准备加权，全部准备好前最多 99%。不按时间跳过加载，不显示慢网/重试提示，不吞掉失败。
-- 揭幕后才解除 `#root` 的 `inert` 和 `aria-busy`；失败保持加载层并暂停圆环。支持减少动态效果，重复完成复用 Promise。
+- 正常揭幕后才解除 `#root` 的 `inert` 和 `aria-busy`；普通资源失败保持加载层并暂停圆环。场景渲染失败由 `showStartupFallback` 标记失败、移除加载层并解除交互锁定，供独立 DOM 兜底使用，不将场景标记就绪。支持减少动态效果，重复完成复用 Promise。
 
 
 - `useSceneTexture.ts` 复用 R3F useLoader / TextureLoader 缓存与 Suspense，支持单 URL、数组和键值对象，不在 effect 中上传 GPU；首屏纹理统一由 SceneWarmup 分帧上传。不要改回 Drei useTexture，其挂载 effect 会立即批量 initTexture，绕过预热调度。

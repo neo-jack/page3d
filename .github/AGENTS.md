@@ -20,3 +20,4 @@
 - GitHub 仓库名称为 neo-jack/page3d；本地编号目录仅用于排序，不作为远程仓库名。
 
 - GHCR 大资源层下载不稳定时，手动 workflow_dispatch 可设置 direct_transfer=true；构建机导出已发布的精确 SHA 镜像，经相同服务器 SSH 凭据上传至按 run_id/run_attempt 隔离的临时目录，校验 SHA-256 后 docker load。之后仍执行原 deploy.sh 的锁、健康检查及回滚，不绕过 DEPLOY_ENABLED 门禁。默认 push 不启用直传；导入阶段清理本次临时文件，不清理其他运行目录。
+- `/api/ai/chat` 的反代必须转发公网 `Host`、`X-Forwarded-Host` 和 TLS 协议；四个本站 HTTP/HTTPS 来源在内部 hop 清空 `Origin`，其他来源保留给 AI 服务校验，不能只依赖容器内部地址。

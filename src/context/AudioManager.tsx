@@ -8,7 +8,7 @@ interface AudioContextType {
     toggleBgm: () => void;
 }
 
-const AudioContext = createContext<AudioContextType>({
+export const AudioContext = createContext<AudioContextType>({
     isMuted: false,
     globalVolume: 0.5,
     bgmOn: false,

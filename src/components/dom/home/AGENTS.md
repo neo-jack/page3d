@@ -2,13 +2,20 @@
 
 首页组合、入口与作品选择状态和返回主页；站点控件仍由 ../../ui/SiteShell.tsx 维护。
 
-**Important:** Canvas 与入口保持挂载；About 揭幕后开始挂载，此后持续保留，首屏 DOM 可见性与进门开始状态同步。
+**Important:** 正常交互中 Canvas 与入口保持挂载；About 揭幕后开始挂载，此后持续保留，首屏 DOM 可见性与进门开始状态同步。渲染初始化失败或上下文丢失时卸载场景并展示 DOM 兜底。
 
 ### Important files
+
+- `SceneCanvas.tsx` — 使用 R3F 公开 createRoot 接口捕获 configure 异步失败，管理尺寸、指针事件、音效 Context 桥接和卸载；保持原相机、DPR 与 frameloop=never，由 SceneActivity 驱动渲染。
+- `SceneFallback.tsx` — 场景故障的独立 DOM 页面，解除启动交互锁定并聚焦标题；重试整页刷新，2D 入口复用 data/site.ts，不自动跳转。
 
 - `HomePage.tsx` — 首页入口，组合 `SiteShell`、Canvas、背景色/雾、`AboutRoom`、`EntranceDoors`、首屏标题和简介；维护入口、返回主页、选中作品与聚焦阶段。顶部控件由 `ui/SiteShell.tsx` 维护。
 
 ### Implementation notes
+
+- 当前 R3F 9.7 Canvas 内部未捕获 configure 拒绝，不能仅用 ErrorBoundary 或 fallback 属性处理 WebGL 初始化失败；SceneCanvas 显式 await/catch，场景树错误另由边界转交首页。不得全局屏蔽 unhandledrejection 或创建永不完成的 Promise。
+- SceneCanvas 每次 effect 使用独立 canvas，避免 StrictMode 下 R3F 延迟卸载释放新上下文；尺寸变化只更新 store，不重建场景。新增跨 DOM/场景 Context 时同步补充桥接。上下文丢失立即转入兜底，由用户整页重试，避免重复渲染失效场景。
+- 验证 WebGL2 getContext 返回 null、初始化抛错、正常首屏、尺寸变化、上下文丢失与重试；检查无未处理 Promise 拒绝、加载层移除、root inert=false、键盘可操作和正确 2D 地址。
 
 - 将 `sceneWarm` 传入 `SceneActivity.ready`，预热完成后才开始常规场景绘制；不要传入揭幕后的 `pageReady`。保持预热与 DOM 图片就绪检查独立，验证首次加载能正常揭幕。
 

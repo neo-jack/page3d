@@ -12,6 +12,8 @@ process.env.VITE_RELEASE ||= process.env.GITHUB_SHA || 'local';
 const env = loadEnv(process.env.NODE_ENV || 'development', process.cwd(), '');
 for (const [key, fallback] of Object.entries({ VITE_MONITOR_SCRIPT: siteConfig.monitorScript, VITE_MONITOR_ENDPOINT: siteConfig.monitorEndpoint, VITE_MONITOR_HOST: siteConfig.monitorHost, VITE_MONITOR_PROJECT: siteConfig.monitorProject })) process.env[key] ??= env[key] ?? fallback ?? '';
 const siteOrigin = env.VITE_SITE_ORIGIN || PUBLIC_SITE_ORIGIN;
+// HTML needs the 2D destination before any application module is downloaded.
+process.env.VITE_2D_URL = `${siteOrigin}/2D/`;
 const aiProxy = { '/api/ai': { target: env.AI_PROXY_TARGET || siteOrigin, changeOrigin: true } };
 
 export default defineConfig({

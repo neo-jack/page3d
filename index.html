@@ -4,6 +4,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // Decide before booting React/WebGL, including landscape phones and iPad desktop mode.
+      var mobileVisitor = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
+        || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+        || window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+      if (mobileVisitor) {
+        document.documentElement.dataset.redirecting2d = 'true';
+        window.location.replace('%VITE_2D_URL%');
+      }
+    </script>
     <link rel="icon" type="image/svg+xml" sizes="any" href="/public/icon.svg" />
     <!-- Title, description, canonical and structured data are emitted by build/seo.js. -->
     <link rel="preload" href="/public/textures/paper-texture.webp" as="image" fetchpriority="high" />
@@ -69,12 +79,14 @@
       import { reportStartupError, startStartup } from '/src/utils/startup.ts';
 
       // Keep React, Three.js and application CSS out of the initial entry chunk.
-      startStartup();
-      import('/src/App.tsx').catch(reportStartupError);
+      if (document.documentElement.dataset.redirecting2d !== 'true') {
+        startStartup();
+        import('/src/App.tsx').catch(reportStartupError);
+      }
     </script>
     <script>
       // Optional telemetry loads independently and never blocks the scene startup.
-      if ('%VITE_MONITOR_SCRIPT%' && location.hostname === '%VITE_MONITOR_HOST%') {
+      if (document.documentElement.dataset.redirecting2d !== 'true' && '%VITE_MONITOR_SCRIPT%' && location.hostname === '%VITE_MONITOR_HOST%') {
         var monitorScript = document.createElement('script');
         monitorScript.dataset.monitorSdk = 'true';
         monitorScript.async = true;

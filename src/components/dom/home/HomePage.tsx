@@ -1,6 +1,7 @@
 import assetFloorPaper from '../../../../public/textures/entrance/floor_paper.webp?url';
 import type { SyntheticEvent } from 'react';
-import { Canvas } from '@react-three/fiber';
+import SceneCanvas from './SceneCanvas';
+import SceneFallback from './SceneFallback';
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import EntranceDoors from '../../canvas/entrance/door/EntranceDoors.tsx';
 import DeferredCorridor, { prefetchCorridorCode } from '../../canvas/DeferredCorridor.tsx';
@@ -24,6 +25,15 @@ const MOBILE_SCENE_QUERY = '(max-width: 600px), (hover: none) and (pointer: coar
 const PortfolioDetails = lazy(() => import('../portfolio/PortfolioDetails.tsx'));
 
 export function HomePage() {
+  const [failed, setFailed] = useState(false);
+  const handleSceneError = useCallback((error: unknown) => {
+    console.error('Unable to display the 3D scene:', error);
+    setFailed(true);
+  }, []);
+  return failed ? <SceneFallback /> : <HomeScene onSceneError={handleSceneError} />;
+}
+
+function HomeScene({ onSceneError }: { onSceneError: (error: unknown) => void }) {
   const [mobileScene, setMobileScene] = useState(() => window.matchMedia(MOBILE_SCENE_QUERY).matches);
   useEffect(() => {
     const media = window.matchMedia(MOBILE_SCENE_QUERY);
@@ -131,13 +141,7 @@ export function HomePage() {
       {!pageReady && <StartupLoader ready={sceneWarm && introBoardReady} onComplete={handleStartupComplete} />}
       {/* Three.js 入口场景作为背景层 */}
       <div className="fixed inset-0 z-0 pointer-events-auto" style={{ backgroundColor: 'transparent' }}>
-        <Canvas
-          frameloop="never"
-          camera={{ position: [0, 0.2, 28], fov: 60, near: 0.1, far: 150 }}
-          dpr={[1, 2]}
-          gl={{ antialias: true, alpha: false }}
-          style={{ cursor: 'auto' }}
-        >
+        <SceneCanvas onError={onSceneError}>
           <SceneActivity ready={sceneWarm} />
           {/* 背景色 / 雾色回退为 #fafafa（与 ref 一致） */}
           <color attach="background" args={['#fafafa']} />
@@ -190,7 +194,7 @@ export function HomePage() {
             onFlightDistanceReached={handleFlightDistanceReached}
             onFlightHintProgress={handleFlightHintProgress}
           />}
-        </Canvas>
+        </SceneCanvas>
       </div>
       <div ref={petReplyPortal}
         className={`${pet.panelOpen ? 'pointer-events-auto' : 'pointer-events-none'} fixed inset-0 z-45`} />
