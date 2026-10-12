@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useAudio } from '../../context/AudioManager.tsx';
-import PerformancePanel from './PerformancePanel';
+import { PORTFOLIO_WALL_LINKS } from '../../data/site';
 
 type SiteShellProps = {
   children: ReactNode;
@@ -26,14 +26,13 @@ function cx(...parts: Array<string | false | null | undefined>) {
 
 export function SiteShell({ children, onReturnHome }: SiteShellProps) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [performanceOpen, setPerformanceOpen] = useState(false);
   const [returnHintVisible, setReturnHintVisible] = useState(false);
   const canReturnHome = Boolean(onReturnHome);
   const menuRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const brandRef = useRef<HTMLSpanElement>(null);
   const scrollRootRef = useRef<HTMLDivElement>(null);
-  const { bgmOn, toggleBgm } = useAudio();
+  const { toggleBgm } = useAudio();
 
   const panelBackground = 'rgba(251, 250, 244, 0.92)';
 
@@ -89,17 +88,13 @@ export function SiteShell({ children, onReturnHome }: SiteShellProps) {
   // 桌面端直接显示导航，移动端复用同一组按钮放入折叠菜单。
   const nav = (
     <>
-      <button className={[navButtonClass, 'normal-case'].join(' ')} type="button" aria-pressed={bgmOn} onClick={toggleBgm}>
-        音乐[{bgmOn ? '|' : '/'}]
-      </button>
-      <button className={navButtonClass} type="button" aria-expanded={performanceOpen}
-        aria-controls="scene-performance-panel" onClick={() => {
-          setPerformanceOpen((open) => !open);
-          if (menuOpen) menuButtonRef.current?.focus();
-          setMenuOpen(false);
-        }}>
-        性能[{performanceOpen ? '|' : '/'}]
-      </button>
+      <a
+        className={navButtonClass}
+        href={PORTFOLIO_WALL_LINKS.find((link) => link.label === '前端监控')?.href}
+        onClick={() => setMenuOpen(false)}
+      >
+        监控
+      </a>
       {onReturnHome && (
         <button
           className={navButtonClass}
@@ -191,7 +186,6 @@ export function SiteShell({ children, onReturnHome }: SiteShellProps) {
           )}
         </div>
       </header>
-      {performanceOpen && <PerformancePanel />}
 
       <div ref={scrollRootRef} className="site-scroll-root relative h-screen overflow-y-auto overflow-x-hidden overscroll-y-contain scrollbar-none [&::-webkit-scrollbar]:hidden">
         {children}

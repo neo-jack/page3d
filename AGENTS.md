@@ -1,6 +1,6 @@
 ## 100my-3dpage
 
-独立 React / Three.js / Vite 主页 Git 仓库。源码位于本仓库根目录；AI 宠物通过版本化 npm tarball 安装，其他服务只通过配置地址接入。
+独立 React / Three.js / Vite AI 向导与复杂交互体验 Git 仓库。源码位于本仓库根目录；AI 宠物通过版本化 npm tarball 安装，其他服务只通过配置地址接入。
 
 **Important:** 不得跨目录导入 104my-ai、监控、Codeground 或 2D 源码；所有依赖由本仓库锁文件与 vendor 保证。原历史已按子目录提取，旧父仓库元数据在 ../.archive。
 
@@ -21,7 +21,7 @@
 - `src/context/` — 场景音效偏好 Context，按其 `AGENTS.md` 维护。
 - `src/shaders/` — 唯一的自定义揭示材质实现，按其 `AGENTS.md` 维护。
 - `src/utils/` — 浏览器运行工具，按其 `AGENTS.md` 维护。
-- `build/seo.js` — 使用 `src/data/site.ts` 的公开域名生成首页元信息、robots.txt、sitemap.xml 和可见的 noscript 回退；当前只收录首页，不为场景状态虚构路由。
+- `build/seo.js` — 使用 `src/data/site.ts` 的公开域名生成首页元信息、robots.txt、sitemap.xml 和可见的 noscript 回退；当前只收录3D页面 `/3D/`，不为场景状态虚构路由。
 - `build/` — 仅供 Node.js 使用的构建插件、资源审计和回归测试源码，按其 `AGENTS.md` 维护；不作为构建输出目录。
 - `src/global.css` — 全局字体、主题变量和基础样式，维护规则见 `src/AGENTS.md`。
 - `tsconfig.json` — TypeScript module resolution and strict checking configuration; it loads Vite client declarations through `compilerOptions.types`.
@@ -30,13 +30,13 @@
 
 ### Implementation notes
 
-- 移动端在 `index.html` head 内直接 `location.replace` 到公开站点 `/2D/`；以移动 UA、iPad 桌面模式和粗指针无悬停能力判断，横屏同样跳转，不单凭窗口宽度判定桌面端。目标由 Vite 根据 site.ts / VITE_SITE_ORIGIN 注入 `VITE_2D_URL`，不依赖加载 React、Three.js 或移动端本地 2D 服务。跳转标记同时阻止 App 动态导入和 3D 监控初始化，避免导航尚未完成时启动场景；保留桌面场景故障兜底。
+- 移动端在 `index.html` head 内直接 `location.replace` 到公开站点根路径 `/`；以移动 UA、iPad 桌面模式和粗指针无悬停能力判断，横屏同样跳转，不单凭窗口宽度判定桌面端。目标由 Vite 根据 site.ts / VITE_SITE_ORIGIN 注入 `VITE_2D_URL`，不依赖加载 React、Three.js 或移动端本地 2D 服务。跳转标记同时阻止 App 动态导入和 3D 监控初始化，避免导航尚未完成时启动场景；保留桌面场景故障兜底。
 
 
 - 本地预览、构建和静态预览分别使用 `npm run dev`、`npm run build`、`npm run preview`；不要臆造额外流程。
 - 开发服务会提供源码与开发 source map，仅供本机开发；对外展示应使用生产构建。共享媒体从 `public/` 导入，笔记附件可位于 `src/data/note/`，均生成内容哈希地址；固定 URL 仅发布许可和站点元数据，内部维护文档不进入产物。这些配置不改变代码、素材的实际来源和许可要求。
 - `App.tsx` 是直接挂载入口，组件树内联在 `createRoot(rootElement).render(...)` 的 `StrictMode` 内，不额外拆分 `App` 包装组件。
-- 标题、描述、canonical、Open Graph、Twitter 与 ProfilePage JSON-LD 由 `build/seo.js` 在 Vite HTML 转换阶段写入，App.tsx 仅维护图标；品牌身份参考本项目站点配置和个人卡片，使用 Laaaanbq / 蓝斌铨，展示页描述应对应个人作品展示。图标维护见 `public/AGENTS.md`。
+- 标题、描述、canonical、Open Graph、Twitter 与 WebPage JSON-LD 由 `build/seo.js` 在 Vite HTML 转换阶段写入，App.tsx 仅维护图标；品牌身份参考本项目站点配置和个人卡片，使用 Laaaanbq / 蓝斌铨，展示页描述应对应 AI 向导与复杂交互体验。图标维护见 `public/AGENTS.md`。
 - `App.tsx` 挂载 `AudioProvider → HomePage`，由 `HomePage` 渲染 `SiteShell` 包裹页面并传入返回主页回调；新增 Context 前确认确实存在跨组件消费者。
 - Three.js 内容放在 `canvas/`，普通页面结构放在 `dom/`，站点级控制放在 `ui/`；共享资源使用 `public/` 的静态 `?url` 导入，笔记媒体由构建插件生成同类导入，细则见 `src/data/note/AGENTS.md`，不能拼接旧公开路径。
 - 修改页面行为时优先核对 `HomePage.tsx`、`SiteShell.tsx` 和 `App.tsx` 的状态和容器关系。
@@ -58,4 +58,7 @@
 
 - GitHub 远程为 `neo-jack/page3d`，公开仓库、master 主分支；主分支以独立项目初始提交重建，重写前历史保存在本机 `.git/history-backups/` 的 Git bundle 中，不发布备份引用。上传默认仅 CI，部署需仓库变量 DEPLOY_ENABLED=true。
 
-- HTML 通过 media="(min-width: 901px)" 预加载简介板 WebP，与 IntroductionBoard 的 picture 断点及静态导入共用同一哈希资源，移动端不得额外下载板图。
+
+- 生产3D入口为 `/3D/`，CI使用 `--base=/3D/` 构建，兼容镜像将产物放在html/3D；根路径由同一Nginx转发独立2D服务。旧 `/2D` 与 `/2D/` 跳转根首页，2D资源仍使用 `/2D/` 前缀；AI与 `/3D/monitor/` 保留原路由。生产发布后同时验证根首页、3D资源与手机返回2D行为。
+
+- 首屏不挂载作品集门牌与五张项目链接卡片，不预加载 hanging-board 图片；作品导航由独立 2D 页面承载。启动不再等待已移除的门牌/画廊图片，门后已有场景交互继续保留。

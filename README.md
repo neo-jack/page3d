@@ -1,12 +1,12 @@
 # page3d
 
-使用 React、TypeScript 和 Three.js 构建的 3D 个人主页，包括纸艺入口、场景交互、作品展示与 AI 向导。
+使用 React、TypeScript 和 Three.js 构建的 AI 向导与复杂交互体验，包括 AI 对话、砸窗互动、纸艺入口、开门转场与空中飞行。作品导航集中在独立 2D 页面，3D 首屏不再展示作品集门牌和项目链接画廊。
 
 AI 向导通过独立的 [aiPet](https://github.com/neo-jack/aiPet) 组件包接入，页面负责场景与交互。
 
 ## 在线体验
 
-[打开 3D 个人主页](https://www.lanbinquan.top/)
+[体验 AI 向导与复杂交互](https://www.lanbinquan.top/3D/)
 
 ## 快速开始
 

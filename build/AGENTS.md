@@ -39,7 +39,7 @@
 - 在项目根目录 运行 `node --test build/notes.test.js` 验证内容编译；测试临时目录位于 `node_modules/.cache/`，不覆盖 dist。新增内容后也运行类型检查、构建与发布审计。
 
 - `seo.js` 在 HTML 转换阶段注入静态 SEO 元信息与 noscript 回退，并为开发服务及构建产物提供 robots.txt、sitemap.xml。域名由 Vite 从 site.ts 传入；不要在 public/ 重复维护同名文件。仅列入实际可独立访问的页面，不加入场景状态或虚假更新时间。
-- 浏览器 `<title>` 固定为 `LBQ©3D©2026`，在 `seo.js` 中维护；社交分享标题、结构化数据与 noscript 继续使用描述性作品集标题。
+- 浏览器 `<title>` 固定为 `LBQ©3D©2026`，在 `seo.js` 中维护；社交分享标题、WebPage 结构化数据与 noscript 使用「AI 向导 · 复杂交互」定位，不再宣传个人作品集。
 
 - 笔记 ID 允许大小写英文字母、数字和短横线，保持原始大小写；note 目录使用 A/B/C 分类编号，catalog 键与组件查询必须完全一致。
 
@@ -49,3 +49,5 @@
 - AI 宠物与客户端工具由版本化 @my-page/ai-pet 包维护；本项目保留消费端协议测试，服务地址见 src/data/integrations.ts，不导入后端源码。
 
 - productionBoundary.test.js 同时验证根 nginx.conf 的独立静态部署与 .github/deploy/nginx.conf 的原站点网关配置。
+
+- 3D canonical、JSON-LD及sitemap页面指向 `/3D/`，noscript二维链接与HTML移动端跳转指向站点根路径；生产workflow使用 `/3D/` base，静态媒体不得继续生成根assets地址。

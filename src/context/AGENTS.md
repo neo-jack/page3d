@@ -6,7 +6,7 @@
 
 ### Important files
 
-- `AudioManager.tsx` — `AudioProvider` 和 `useAudio`，为 `TechStackBalloons` 的弹开音效提供静音/音量偏好，为 `SiteShell` 顶部音乐按钮及 S 快捷键提供 `bgmOn` / `toggleBgm`。
+- `AudioManager.tsx` — `AudioProvider` 和 `useAudio`，为 `TechStackBalloons` 的弹开音效提供静音/音量偏好，为 `SiteShell` 的 S 快捷键提供 `toggleBgm`；顶部菜单不再展示音乐开关。
 
 ### Implementation notes
 

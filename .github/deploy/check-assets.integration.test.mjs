@@ -131,17 +131,17 @@ test('the production Alpine image checks real 404 headers and legal notices', { 
     assert.match(headers, /^Cache-Control: no-store\r?$/mi, url);
     assert.doesNotMatch(headers, /^(?:CDN-Cache-Control|Cloudflare-CDN-Cache-Control):/mi, url);
   }
-  for (const url of ['/', '/2D/', '/THIRD-PARTY-NOTICES.txt', '/textures/sample.LICENSE.md', '/2D/fonts/font.ttf']) {
+  for (const url of ['/', '/3D/', '/3D/THIRD-PARTY-NOTICES.txt', '/3D/textures/sample.LICENSE.md', '/2D/fonts/font.ttf']) {
     assert.match(await getHeaders(url), /^HTTP\/1\.1 200 /, url);
   }
-  for (const url of ['/assets/A1b2c3d4.js', '/assets/B2c3d4e5.glb', '/assets/C3d4e5f6.ktx2']) {
+  for (const url of ['/3D/assets/A1b2c3d4.js', '/3D/assets/B2c3d4e5.glb', '/3D/assets/C3d4e5f6.ktx2']) {
     const headers = await getHeaders(url);
     assert.match(headers, /^HTTP\/1\.1 200 /, url);
     assert.match(headers, /^Cache-Control: public, max-age=31536000, immutable\r?$/mi, url);
     assert.match(headers, /^CDN-Cache-Control: public, max-age=31536000\r?$/mi, url);
     assert.match(headers, /^Cloudflare-CDN-Cache-Control: public, max-age=31536000\r?$/mi, url);
   }
-  for (const url of ['/', '/index.html', '/portfolio/example']) {
+  for (const url of ['/', '/3D/index.html', '/3D/portfolio/example']) {
     const headers = await getHeaders(url);
     assert.match(headers, /^Cache-Control: .*no-store/mi, url);
     assert.doesNotMatch(headers, /^(?:CDN-Cache-Control|Cloudflare-CDN-Cache-Control):/mi, url);
@@ -152,6 +152,13 @@ test('the production Alpine image checks real 404 headers and legal notices', { 
     assert.match(response, /^HTTP\/1\.1 404 /);
     assert.match(response, /^Cache-Control: no-store\r?$/mi);
   }
+  for (const url of ['/2D', '/2D/']) {
+    const headers = await getHeaders(`${url}?lang=zh`);
+    assert.match(headers, /^HTTP\/1\.1 308 /);
+    assert.match(headers, /^Location: \/\?lang=zh\r?$/mi);
+  }
+  const rootPage = await docker(['exec', name, 'curl', '--fail', '--silent', 'http://127.0.0.1/']);
+  assert.match(rootPage.stdout, /2D fixture/);
   const reactRedirect = await getHeaders('/React');
   assert.match(reactRedirect, /^HTTP\/1\.1 308 /);
   assert.match(reactRedirect, /^Location: https:\/\/www\.lanbinquan\.top\/React\/\r?$/mi);
@@ -176,8 +183,8 @@ test('the production Alpine image checks real 404 headers and legal notices', { 
   const probe = await docker(['exec', name, 'sh', '/usr/local/bin/check-assets.sh']);
   assert.match(probe.stdout, /Retired media routes return 404\/no-store/);
 
-  await docker(['exec', name, 'rm', '/usr/share/nginx/html/THIRD-PARTY-NOTICES.txt']);
-  assert.match(await getHeaders('/THIRD-PARTY-NOTICES.txt'), /^HTTP\/1\.1 404 /);
+  await docker(['exec', name, 'rm', '/usr/share/nginx/html/3D/THIRD-PARTY-NOTICES.txt']);
+  assert.match(await getHeaders('/3D/THIRD-PARTY-NOTICES.txt'), /^HTTP\/1\.1 404 /);
   const withoutNotice = await docker(['exec', name, 'sh', '/usr/local/bin/check-assets.sh']);
   assert.match(withoutNotice.stdout, /Retired media routes return 404\/no-store/);
 
@@ -199,9 +206,9 @@ test('the production Alpine image checks real 404 headers and legal notices', { 
   await docker(['stop', apiName]);
   await docker(['stop', toolName]);
   assert.match(await getHeaders('/'), /^HTTP\/1\.1 200 /, 'AI downtime must not break the site');
-  assert.match(await getHeaders('/2D/'), /^HTTP\/1\.1 200 /, 'AItool downtime must not break the 2D page');
+  assert.match(await getHeaders('/'), /^HTTP\/1\.1 200 /, 'AItool downtime must not break the 2D page');
   assert.match(await getHeaders('/api/ai/missing'), /^HTTP\/1\.1 404 /, 'API errors must not fall back to HTML');
   await docker(['stop', twoName]);
-  assert.match(await getHeaders('/'), /^HTTP\/1\.1 200 /, '2D downtime must not affect 3D');
-  assert.match(await getHeaders('/2D/'), /^HTTP\/1\.1 50[24] /, 'Never serve a stale bundled 2D release after split');
+  assert.match(await getHeaders('/3D/'), /^HTTP\/1\.1 200 /, '2D downtime must not affect 3D');
+  assert.match(await getHeaders('/'), /^HTTP\/1\.1 50[24] /, 'Never serve a stale bundled 2D release after split');
 });

@@ -13,7 +13,7 @@
 - `canvas/entrance/` — 按 `door/`、`wall/`、`window/`、`pet/`、`planter/`、`ground/` 分类入口物品，共用逻辑放在 `shared/`。
 - `canvas/about/` — 天空、云朵、纸飞机和飞行控制。
 - `canvas/portfolio/` — 漂浮作品卡片与聚焦镜头；与 `dom/portfolio/PortfolioDetails.tsx` 的纸张详情通过首页状态协作。
-- `ui/SiteShell.tsx` — 顶部站点壳、背景音乐控制、移动端菜单和滚动容器。
+- `ui/SiteShell.tsx` — 顶部站点壳、监控跳转、移动端菜单和滚动容器。
 
 ### Implementation notes
 

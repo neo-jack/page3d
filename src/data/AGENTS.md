@@ -21,3 +21,5 @@
 - catalog 的 `balloons` 引用 `TECHNOLOGY_BALLOONS` 的类型化 key；当前技术栈同属示意占位，正式发布前以真实项目清单替换。映射保存显式导入的 `sketch` / `painted` URL；CSS 正面纹理为 848×1264，宽高比为 `848 / 1264`；其余五组为 1024×1536，宽高比为 `2 / 3`，保持方块与图标原比例。触摸端复用素描 URL，不拼接文件名。
 - 工程优化和作品的标题维护在 `note/` 的 Markdown 头部，正文使用 Markdown，不在组件中复制内容；场景类型、排序和封面等仅在其 catalog 中维护。工程列表平铺，无嵌套子条目。
 - AI 宠物与客户端工具由版本化 @my-page/ai-pet 包维护；本项目保留消费端协议测试，服务地址见 src/data/integrations.ts，不导入后端源码。
+
+- LEGACY_SITE_URL保留标识符兼容性，但实际2D入口为站点根路径 `/`；3D主页公开地址为 `/3D/`。

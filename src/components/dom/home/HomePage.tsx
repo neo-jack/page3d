@@ -1,5 +1,4 @@
 import assetFloorPaper from '../../../../public/textures/entrance/floor_paper.webp?url';
-import type { SyntheticEvent } from 'react';
 import SceneCanvas from './SceneCanvas';
 import SceneFallback from './SceneFallback';
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
@@ -8,8 +7,6 @@ import DeferredCorridor, { prefetchCorridorCode } from '../../canvas/DeferredCor
 import SceneWarmup from '../../canvas/SceneWarmup.tsx';
 import SceneActivity from '../../canvas/SceneActivity.tsx';
 import StartupLoader from '../loading/StartupLoader.tsx';
-import IntroductionBoard from '../board/IntroductionBoard.tsx';
-import PortfolioWallCard from '../board/PortfolioWallCard.tsx';
 import FlightGestureHint from '../flight/FlightGestureHint.tsx';
 import { PaperPetTrigger, PaperPetReply, usePaperPet } from '@my-page/ai-pet';
 import { SiteShell } from '../../ui/SiteShell.tsx';
@@ -63,9 +60,6 @@ function HomeScene({ onSceneError }: { onSceneError: (error: unknown) => void })
   const [portfolioPhase, setPortfolioPhase] = useState<PortfolioPhase>('idle');
   const closeProject = useCallback(() => setSelectedProjectId(null), []);
   const [sceneWarm, setSceneWarm] = useState(false);
-  const [introBoardReady, setIntroBoardReady] = useState(false);
-  const [galleryReady, setGalleryReady] = useState(false);
-  const handleGalleryReady = useCallback(() => setGalleryReady(true), []);
   const [pageReady, setPageReady] = useState(false);
   const [corridorReady, setCorridorReady] = useState(false);
   const [corridorError, setCorridorError] = useState(false);
@@ -133,14 +127,12 @@ function HomeScene({ onSceneError }: { onSceneError: (error: unknown) => void })
     setSceneWarm(true);
   }, []);
   const handleStartupComplete = useCallback(() => setPageReady(true), []);
-  const handleIntroBoardLoad = useCallback((event: SyntheticEvent<HTMLImageElement>) => {
-    event.currentTarget.decode().then(() => setIntroBoardReady(true)).catch(reportStartupError);
-  }, []);
+
 
   return (
     <SiteShell onReturnHome={hasEntered && !isReturningHome ? handleReturnHome : undefined}>
     <main className="relative min-h-screen bg-transparent text-l1">
-      {!pageReady && <StartupLoader ready={sceneWarm && introBoardReady && galleryReady} onComplete={handleStartupComplete} />}
+      {!pageReady && <StartupLoader ready={sceneWarm} onComplete={handleStartupComplete} />}
       {/* Three.js 入口场景作为背景层 */}
       <div className="fixed inset-0 z-0 pointer-events-auto" style={{ backgroundColor: 'transparent' }}>
         <SceneCanvas onError={onSceneError}>
@@ -165,8 +157,6 @@ function HomeScene({ onSceneError }: { onSceneError: (error: unknown) => void })
               enabled={!hasEntered || isReturningHome}
               canEnter={sceneWarm && pageReady && !isReturningHome}
               prepareEntry={prepareEntry}
-              introductionBoard={<IntroductionBoard onLoad={handleIntroBoardLoad} />}
-              portfolioWallCard={<PortfolioWallCard onReady={handleGalleryReady} />}
               petMode={pet.mode}
               petVisible={!mobileScene}
               petPanelOpen={pet.panelOpen}
@@ -238,7 +228,7 @@ function HomeScene({ onSceneError }: { onSceneError: (error: unknown) => void })
             探索
           </span>
           <span role="status" className="relative z-1 block">
-            {corridorError ? '作品集暂时加载失败，请刷新重试' : waitingForCorridor ? '正在准备空中走廊，就绪后自动进入…' : '点击物品进行交互,点击门进入作品集空中走廊'}
+            {corridorError ? '空中走廊暂时加载失败，请刷新重试' : waitingForCorridor ? '正在准备空中走廊，就绪后自动进入…' : '与 AI 向导对话，点击物品互动，开门探索空中走廊'}
           </span>
         </aside>
       )}

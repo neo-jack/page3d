@@ -146,7 +146,8 @@ wait_healthy "$name"
 case "$DEPLOY_COMPONENT" in
     3d)
         docker exec "$name" sh /usr/local/bin/check-assets.sh
-        check_gateway http://127.0.0.1/2D/
+        check_gateway http://127.0.0.1/3D/
+        check_gateway http://127.0.0.1/
         ;;
     2d)
         docker exec "$name" curl --fail --silent --show-error --max-time 5 http://127.0.0.1/2D/ >/dev/null

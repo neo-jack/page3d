@@ -51,7 +51,7 @@ jobs:
       - name: Check chat stream client
         run: node --experimental-strip-types --test build/aiChat.test.mjs build/siteCards.test.mjs
       - name: Build production bundle
-        run: npm run build -- --base=/
+        run: npm run build -- --base=/3D/
       - name: Verify released assets
         run: node build/auditAssetRelease.js dist
       - name: Store build artifact
