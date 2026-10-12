@@ -16,3 +16,5 @@
 - `PortfolioWallCard` 使用 `data/site.ts` 的已确认公开地址，按“AI竞品分析agent、2D个人页面、前端监控、miniReact源码、元素选择器”顺序展示五个项目；只显示中国画面和项目名称，不显示墙壁英文、额外技术描述或重复标题。五个 A4 画框通过 Drei `Html transform` 贴在入口右墙上方，横向一排排列，外链使用原生新标签页打开。DOM 总宽 1920px、列间距 40px，配合墙面 Html scale=0.74；项目牌参考向导气泡，使用 tiktok/sans-serif、52px 常规字重、浅灰绿色 #70766a、暖白底 #f5f4ed 与 #929487/50 边框，至少 112px 高并均衡换行；图片保留低饱和纸感，适度提亮，取消透明度与 multiply 混合，避免墙纹和灰蒙叠色干扰细节。画框必须保持 `210 / 297` 的 A4 竖向比例，不要恢复多行画廊或方形作品框；不要把私有服务地址、源码路径或凭据写入组件。
 - `introBoardReady` 在当前 `picture` 图片解码完成后设置，并与 `sceneWarm` 一起传给 `StartupLoader.ready`，避免揭幕后先出现无板面的文字；桌面木板加载失败进入现有重试流程。
 - 第二张卡片保留原画面，名称为“2D个人页面”，使用 `LEGACY_SITE_URL` 指向线上 `/2D/`；顶部导航不再提供旧版入口。
+
+- 画廊使用无损 WebP；PortfolioWallCard 在五张实际 img 全部 decode 成功后调用 onReady，失败交给 reportStartupError。HomePage 将 galleryReady 纳入首屏揭幕条件，不能仅依赖 Three.js 资源进度。

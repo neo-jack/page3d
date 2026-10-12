@@ -1,17 +1,30 @@
-import assetGalleryArt04 from '../../../../public/textures/portfolio/gallery-art-04.png?url';
-import assetGalleryArt05 from '../../../../public/textures/portfolio/gallery-art-05.png?url';
-import assetGalleryArt06 from '../../../../public/textures/portfolio/gallery-art-06.png?url';
-import assetGalleryArt02 from '../../../../public/textures/portfolio/gallery-art-02.png?url';
-import assetGalleryArt03 from '../../../../public/textures/portfolio/gallery-art-03.png?url';
+import { useEffect, useRef } from 'react';
+import { reportStartupError } from '../../../utils/startup';
+import assetGalleryArt04 from '../../../../public/textures/portfolio/gallery-art-04.webp?url';
+import assetGalleryArt05 from '../../../../public/textures/portfolio/gallery-art-05.webp?url';
+import assetGalleryArt06 from '../../../../public/textures/portfolio/gallery-art-06.webp?url';
+import assetGalleryArt02 from '../../../../public/textures/portfolio/gallery-art-02.webp?url';
+import assetGalleryArt03 from '../../../../public/textures/portfolio/gallery-art-03.webp?url';
 import { PORTFOLIO_WALL_LINKS } from '../../../data/site';
 
 // 画面顺序与墙牌顺序一致：竞品研究、2D个人页面、监控、miniReact、原生选择器。
 const galleryArt = [assetGalleryArt05, assetGalleryArt06, assetGalleryArt04, assetGalleryArt02, assetGalleryArt03];
 
 /** 入口右墙的纸质画廊；由 EntranceDoors 以 Html transform 贴在墙面。 */
-export default function PortfolioWallCard() {
+export default function PortfolioWallCard({ onReady }: { onReady: () => void }) {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const images = Array.from(sectionRef.current?.querySelectorAll('img') ?? []);
+    Promise.all(images.map((image) => image.decode()))
+      .then(() => { if (!cancelled) onReady(); })
+      .catch((error: unknown) => { if (!cancelled) reportStartupError(error); });
+    return () => { cancelled = true; };
+  }, [onReady]);
   return (
     <section
+      ref={sectionRef}
       className="pointer-events-auto relative w-480 max-[900px]:hidden"
       style={{ fontFamily: '"tiktok", sans-serif' }}
       aria-label="个人作品集项目入口"
@@ -30,6 +43,10 @@ export default function PortfolioWallCard() {
               <img
                 src={galleryArt[index]}
                 alt=""
+                loading="eager"
+                decoding="sync"
+                width={512}
+                height={725}
                 draggable={false}
                 className="absolute inset-0 h-full w-full object-cover"
                 style={{ filter: 'grayscale(0.16) saturate(0.65) brightness(1.02) contrast(0.96)' }}

@@ -18,6 +18,8 @@
 
 ### Implementation notes
 
+- 消费端动作协议测试与已安装宠物包一致：仅接受单项 `break_glass`，拒绝 `open_scroll` 及其与合法动作混合的围栏；更新 vendor 包时同步验证。
+
 - `node --experimental-strip-types --test build/balloonRaycast.test.mjs` 使用真实气球贴图与 Three.js 射线验证透明区域穿透、实色命中、缓存及禁用/隐藏状态。
 - Vite 关闭 source map 和 `copyPublicDir`、启用压缩与 hash-only 输出名。`publicDir: false` 禁用默认直出；`public/` 媒体经静态导入生成哈希地址，插件仅按固定 URL 发布许可文件及站点元数据。
 - 许可文档（包括 Markdown 和位于旧纹理目录的 sidecar）保持可访问。维护文档、隐藏目录、源码不发布，不跟随符号链接。

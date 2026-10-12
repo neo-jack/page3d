@@ -502,7 +502,7 @@ const EntranceDoors: React.FC<EntranceDoorsProps> = ({
         </Html>
       )}
 
-      {enabled && portfolioWallCard && (
+      {portfolioWallCard && (
         <Html
           transform
           position={[3, 1.52, wallThickness / 2 + 0.012]}
@@ -511,7 +511,9 @@ const EntranceDoors: React.FC<EntranceDoorsProps> = ({
           pointerEvents="auto"
           zIndexRange={[4, 1]}
         >
-          {portfolioWallCard}
+          <div style={{ visibility: enabled ? 'visible' : 'hidden' }} inert={!enabled}>
+            {portfolioWallCard}
+          </div>
         </Html>
       )}
 

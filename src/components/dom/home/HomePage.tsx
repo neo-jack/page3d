@@ -64,6 +64,8 @@ function HomeScene({ onSceneError }: { onSceneError: (error: unknown) => void })
   const closeProject = useCallback(() => setSelectedProjectId(null), []);
   const [sceneWarm, setSceneWarm] = useState(false);
   const [introBoardReady, setIntroBoardReady] = useState(false);
+  const [galleryReady, setGalleryReady] = useState(false);
+  const handleGalleryReady = useCallback(() => setGalleryReady(true), []);
   const [pageReady, setPageReady] = useState(false);
   const [corridorReady, setCorridorReady] = useState(false);
   const [corridorError, setCorridorError] = useState(false);
@@ -138,7 +140,7 @@ function HomeScene({ onSceneError }: { onSceneError: (error: unknown) => void })
   return (
     <SiteShell onReturnHome={hasEntered && !isReturningHome ? handleReturnHome : undefined}>
     <main className="relative min-h-screen bg-transparent text-l1">
-      {!pageReady && <StartupLoader ready={sceneWarm && introBoardReady} onComplete={handleStartupComplete} />}
+      {!pageReady && <StartupLoader ready={sceneWarm && introBoardReady && galleryReady} onComplete={handleStartupComplete} />}
       {/* Three.js 入口场景作为背景层 */}
       <div className="fixed inset-0 z-0 pointer-events-auto" style={{ backgroundColor: 'transparent' }}>
         <SceneCanvas onError={onSceneError}>
@@ -164,7 +166,7 @@ function HomeScene({ onSceneError }: { onSceneError: (error: unknown) => void })
               canEnter={sceneWarm && pageReady && !isReturningHome}
               prepareEntry={prepareEntry}
               introductionBoard={<IntroductionBoard onLoad={handleIntroBoardLoad} />}
-              portfolioWallCard={<PortfolioWallCard />}
+              portfolioWallCard={<PortfolioWallCard onReady={handleGalleryReady} />}
               petMode={pet.mode}
               petVisible={!mobileScene}
               petPanelOpen={pet.panelOpen}

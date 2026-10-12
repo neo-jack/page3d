@@ -37,7 +37,7 @@
 
 - `HomePage` 持有 `PaperWindowHandle` ref；AI 完整回答的白名单动作通过 `handleSceneActions` 执行，执行前检查仍在入口且页面和场景就绪。仅支持砸窗，每次选择一个尚未投掷的窗格；实际结果反馈给向导。进门取消 AI 请求。`mobileScene` 监听 `(max-width: 600px), (hover: none) and (pointer: coarse)`，手机竖横屏均隐藏宠物/木板/所有向导 DOM 及飞行提示；进入该模式立即取消 AI 请求，不提供替代按钮。桌面保留宠物与说话气泡。
 
-- 入口不挂载工程卷轴，不维护其展开状态或等待其图片解码；StartupLoader 仅等待 sceneWarm 与 introBoardReady。旧后端返回不支持的动作时反馈不可用，不回退执行砸窗。
+- 入口不挂载工程卷轴，不维护其展开状态或等待其图片解码；StartupLoader 等待 sceneWarm、introBoardReady 与五张墙面画廊图片解码后的 galleryReady。旧后端返回不支持的动作时反馈不可用，不回退执行砸窗。
 - AI 宠物与客户端工具由版本化 @my-page/ai-pet 包维护；本项目保留消费端协议测试，服务地址见 src/data/integrations.ts，不导入后端源码。
 
 - 走廊就绪由 `corridorReady` 单独记录；`prepareEntry` 返回 Promise，提前点门显示准备提示，就绪后自动进入，失败只提示走廊不可用并保留入口。回调保持稳定，卸载时拒绝未完成请求。作品详情通过 lazy 在首次进门后加载，不进入首屏主包。

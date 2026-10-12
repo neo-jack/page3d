@@ -24,3 +24,5 @@
 
 - `context-tool-zh.webp` 的标题为“界面元素 / 选择器”，插图为浏览器选框到 AI 上下文，标注“选择元素 / 交给 AI”；通过 imgaier 参考编辑原卡面后无损编码，当前像素基线见 `../../../build/assetBaseline.json`。
 - `gallery-art-sheet.png` 保留生成图的 1536×1024 PNG 像素；六张 `gallery-art-*.png` 保留 512×725 竖向纸张比例，入口画框固定 `210 / 297` 的 A4 外框，不得改回方形画框。
+
+- gallery-art-02.webp … gallery-art-06.webp 是入口实际使用的无损版本，尺寸与 PNG 源图完整 RGBA 一致；PNG 保留为源文件，不被组件引用、不进入发布包。完整性清单同时记录源文件与 WebP。

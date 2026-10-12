@@ -379,6 +379,41 @@
       "height": 1254,
       "rgbaSha256": "6bf1054278236270544b2952e62a6cd1f1b9ebd26e991aa57fad9cad1718cb9e",
       "sha256": "05f17c3edf75f3ee4b4b45aefc53a970cb25262e965e6fcf27ebc16b31352b8d"
+    },
+    {
+      "file": "textures/portfolio/gallery-art-02.webp",
+      "width": 512,
+      "height": 725,
+      "rgbaSha256": "14e25f9761c4718e2917a1d70ee8b1491dca38aab03b12960eea2ff6246ae4d8",
+      "sha256": "3bf641070efea197fb966672e42e8a6041f9c4a4d7351b7ed916c2c3db05d252"
+    },
+    {
+      "file": "textures/portfolio/gallery-art-03.webp",
+      "width": 512,
+      "height": 725,
+      "rgbaSha256": "71133462af13aa70ba0e47c22b0121deaf9e9956de6b299580bc4aa655ca31a1",
+      "sha256": "62cf0dd823a7934e5c7ed0a0c9c4d96ef107803cf3c047f749dda08b05ded403"
+    },
+    {
+      "file": "textures/portfolio/gallery-art-04.webp",
+      "width": 512,
+      "height": 725,
+      "rgbaSha256": "43420a36db6a9c83fc4bfe1b6cdfb24a6c7814ed2f8b05019e40f6a3ffba9553",
+      "sha256": "eeb44c6790344c43c9fdc6243937d0f6449b51866b9b319faf9c6ceb8eacb73f"
+    },
+    {
+      "file": "textures/portfolio/gallery-art-05.webp",
+      "width": 512,
+      "height": 725,
+      "rgbaSha256": "64cb2c7c80a732d0e379e18f2ae2dc0d56c98372dc2cf25cefddca64c2d402de",
+      "sha256": "0bcb9ad6f49dabdac2ada3b62df62e0a41646056d9d75b35c1f5f35868673c0c"
+    },
+    {
+      "file": "textures/portfolio/gallery-art-06.webp",
+      "width": 512,
+      "height": 725,
+      "rgbaSha256": "2abc47d13cba96b86b4ec6aa23408133dac1521cf9ddd700d202762c5702a0c2",
+      "sha256": "62f8e4447696e584290ed3b45d0cfa82e723492df2a9b65e5b0af091eab75453"
     }
   ]
 }
